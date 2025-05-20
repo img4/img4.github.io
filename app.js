@@ -7,6 +7,7 @@ $(() => {
 		console.log('init single image')
 		loadImageByID(id, r => {
 			console.log('image data loaded. show image. r:',r)
+			$('title').text(r.p)
 			$('body').append('<div id="single"><div id="prompt">'+r.p+'</div><img src="'+r.i+'" alt=""/></div>')
 		})
 	} else { // view gallery, with modal images

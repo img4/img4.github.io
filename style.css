@@ -1,5 +1,5 @@
 body {
-    background-color: #202124; /* Chrome's dark gray background */
+    background-color: #202124 !important; /* Chrome's dark gray background */
     margin: 0;
     height: 100vh;
     display: flex;
