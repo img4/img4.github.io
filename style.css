@@ -10,8 +10,10 @@ body {
 }
 
 #prompt {
-    font-size:24px;
-    color:#f0f0f0;
+    font-size: 24px;
+    color: #f0f0f0;
+    text-align: center;
+    margin-bottom: .5em;
 }
 img {
     max-width: 100%;
