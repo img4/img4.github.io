@@ -21,7 +21,9 @@ $(() => {
 })
 
 function loadImageByID(id, cb) {
-	$.get('https://raw.githubusercontent.com/' + userRepo + '/HEAD/images/' + id[0] + '/' + (id.length > 1 ? id[1] : '0') + '/' + id)
+	let url = 'https://raw.githubusercontent.com/' + userRepo + '/HEAD/images/' + id[0] + '/' + (id.length > 1 ? id[1] : '0') + '/' + id
+	console.log('loadImageByID() url:', url)
+	$.get(url)
 		.done(r => {
 			try {
 				data = JSON.parse(r)/*
