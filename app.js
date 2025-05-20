@@ -45,6 +45,7 @@ function loadImageByID(id, cb) {
 }
 
 function b64Decode(r) {
+	if(!r) return ''
 	const bs = atob(r); // https://tinyurl.com/atob5
 	const b = new Uint8Array(bs.length);
 	for (let i = 0; i < bs.length; i++) b[i] = bs.charCodeAt(i);
