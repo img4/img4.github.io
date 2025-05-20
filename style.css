@@ -9,6 +9,10 @@ body {
     color: #f0f0f0;
 }
 
+#prompt {
+    font-size:24px;
+    color:#f0f0f0;
+}
 img {
     max-width: 100%;
     max-height: 100vh;
