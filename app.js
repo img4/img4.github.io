@@ -6,16 +6,19 @@ $(() => {
 	if (id) { // view one image, with link to gallery
 		console.log('init single image')
 		loadImageByID(id, r => {
-			console.log('image data loaded. show image. r:',r)
+			console.log('image data loaded. show image. r:', r)
+			let svcId = r.m.split('-')[0], iconId
+			if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
+			$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
 			$('title').text(r.p)
-			$('body').append('<div id="single"><div id="prompt">'+r.p+'</div><img src="'+r.i+'" alt=""/></div>')
+			$('body').append('<div id="single"><div id="prompt">' + r.p + '</div><img src="' + r.i + '" alt=""/></div>')
 		})
 	} else { // view gallery, with modal images
 		console.log('init gallery')
 		// get latest image id
 		$.get('https://raw.githubusercontent.com/' + userRepo + '/HEAD/index')
 			.done(r => {
-				console.log('r:',r)
+				console.log('r:', r)
 			})
 	}
 
@@ -50,7 +53,7 @@ function loadImageByID(id, cb) {
 }
 
 function b64Decode(r) {
-	if(!r) return '' // tmp due to missing .p
+	if (!r) return '' // tmp due to missing .p
 	const bs = atob(r); // https://tinyurl.com/atob5
 	const b = new Uint8Array(bs.length);
 	for (let i = 0; i < bs.length; i++) b[i] = bs.charCodeAt(i);
