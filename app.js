@@ -11,7 +11,7 @@ $(() => {
 			if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
 			$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
 			$('title').text(r.p)
-			$('body').append('<div id="single"><div id="prompt">' + r.p + '</div><img src="' + r.i + '" alt=""/></div>')
+			$('body').append('<div id="single"><div id="header"><div id="prompt">' + r.p + '</div><div id="model">' + r.m + '</div></div><img src="' + r.i + '" alt=""/></div>')
 		})
 	} else { // view gallery, with modal images
 		console.log('init gallery')
