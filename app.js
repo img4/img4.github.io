@@ -21,12 +21,11 @@ $(() => {
 				console.log('r:', r)
 			})
 	}
-
 })
 
 function loadImageByID(id, cb) {
 	let url = 'https://raw.githubusercontent.com/' + userRepo + '/HEAD/images/' + id[0] + '/' + (id.length > 1 ? id[1] : '0') + '/' + id
-	console.log('source url: ',url)
+	console.log('source url: ', url)
 	$.get(url)
 		.done(r => {
 			try {
