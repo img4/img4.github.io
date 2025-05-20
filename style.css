@@ -6,6 +6,7 @@ body {
     justify-content: center;
     align-items: center;
     overflow: auto;
+    color: #f0f0f0;
 }
 
 img {
