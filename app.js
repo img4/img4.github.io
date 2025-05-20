@@ -5,9 +5,9 @@ $(() => {
 	// on load, view one image or gallery
 	if (id) { // view one image, with link to gallery
 		console.log('init single image')
-		loadImageByID(id, data => {
-			console.log('image data loaded. show image')
-			$('body').append('<div id="single"><div id="prompt">'+data.p+'</div><a download="file.jpg"><img src="'+r.i+'" alt=""></a></div>')
+		loadImageByID(id, r => {
+			console.log('image data loaded. show image. r:',r)
+			$('body').append('<div id="single"><div id="prompt">'+r.p+'</div><a download="file.jpg"><img src="'+r.i+'" alt=""></a></div>')
 		})
 	} else { // view gallery, with modal images
 		console.log('init gallery')
@@ -47,7 +47,7 @@ function loadImageByID(id, cb) {
 }
 
 function b64Decode(r) {
-	if(!r) return ''
+	if(!r) return '' // tmp due to missing .p
 	const bs = atob(r); // https://tinyurl.com/atob5
 	const b = new Uint8Array(bs.length);
 	for (let i = 0; i < bs.length; i++) b[i] = bs.charCodeAt(i);
