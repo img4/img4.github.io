@@ -6,14 +6,15 @@ $(() => {
 	if (id) { // view one image, with link to gallery
 		console.log('init single image')
 		loadImageByID(id, data => {
-			console.log('image data loaded. pop up modal')
+			console.log('image data loaded. show image')
+			$('body').append('<div id="single"><div id="prompt">'+data.p+'</div><a download="file.jpg"><img src="'+r.i+'" alt=""></a></div>')
 		})
 	} else { // view gallery, with modal images
 		console.log('init gallery')
 		// get latest image id
 		$.get('https://raw.githubusercontent.com/' + userRepo + '/HEAD/index')
 			.done(r => {
-				$('body').append('<div id="single"><a download="file.jpg"><img src="'+r.i+'"></a></div>')
+				console.log('r:',r)
 			})
 	}
 
