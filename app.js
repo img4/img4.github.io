@@ -6,7 +6,7 @@ $(() => {
 	if (id) { // view one image, with link to gallery
 		console.log('init single image')
 		loadImageByID(id, r => {
-			console.log('image data loaded. show image. r:', r)
+			console.log('show image')
 			let svcId = r.m.split('-')[0], iconId
 			if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
 			$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
@@ -26,12 +26,11 @@ $(() => {
 
 function loadImageByID(id, cb) {
 	let url = 'https://raw.githubusercontent.com/' + userRepo + '/HEAD/images/' + id[0] + '/' + (id.length > 1 ? id[1] : '0') + '/' + id
-	console.log('loadImageByID() url:', url)
+	console.log('source url: ',url)
 	$.get(url)
 		.done(r => {
 			try {
 				data = JSON.parse(r)
-				console.log('got image data [orig]:', data)
 				/*
 										{ // service, model, prompt, type, image data
 											"s": "Gemini",
@@ -41,7 +40,7 @@ function loadImageByID(id, cb) {
 											"i": "..." (data uri)
 										}*/
 				data.p = b64Decode(data.p)
-				console.log('got image data:', data)
+				console.log('image data:', data)
 				cb(data)
 			} catch (e) {
 				console.log('loadImageByID() error: ' + e.message)
