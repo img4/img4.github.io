@@ -27,14 +27,16 @@ function loadImageByID(id, cb) {
 	$.get(url)
 		.done(r => {
 			try {
-				data = JSON.parse(r)/*
-						{ // service, model, prompt, type, image data
-							"s": "Gemini",
-							"m": "imagen-3-generate-002",
-							"p": "funny picture of a shrew", (b64)
-							"t": "image/png",
-							"i": "..." (data uri)
-						}*/
+				data = JSON.parse(r)
+				console.log('got image data [orig]:', data)
+				/*
+										{ // service, model, prompt, type, image data
+											"s": "Gemini",
+											"m": "imagen-3-generate-002",
+											"p": "funny picture of a shrew", (b64)
+											"t": "image/png",
+											"i": "..." (data uri)
+										}*/
 				data.p = b64Decode(data.p)
 				console.log('got image data:', data)
 				cb(data)
