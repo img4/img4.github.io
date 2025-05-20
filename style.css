@@ -6,7 +6,7 @@ body {
     font-size: 16px;
 }
 #single {
-    display: block;
+    width:100%;
 }
 
 #single img {
