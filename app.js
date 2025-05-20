@@ -38,7 +38,7 @@ function loadImageByID(id, cb) {
 				console.log('got image data:', data)
 				cb(data)
 			} catch (e) {
-				$('body').text('loadImageByID() error: ' + e.message)
+				console.log('loadImageByID() error: ' + e.message)
 			}
 		})
 		.fail(() => {
