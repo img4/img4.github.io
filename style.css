@@ -20,6 +20,7 @@ body {
 #prompt {
     font-size: 20px;
     color: #e0e0e0;
+    display: flex;
     flex-wrap: wrap;
 }
 
