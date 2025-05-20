@@ -33,7 +33,7 @@ function loadImageByID(id, cb) {
 						}*/
 				data.p = b64Decode(data.p)
 				console.log('got image data:', data)
-				return data
+				cb(data)
 			} catch (e) {
 				$('body').text('loadImageByID() error: ' + e.message)
 				console.log('r:', r)
