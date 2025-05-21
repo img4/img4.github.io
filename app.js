@@ -36,7 +36,7 @@ $(() => {
 				$('body').append('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
 			} else {
 				// $('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.href=location.href.split(\'&\')[0]+\'&\'+Date.now()">Refresh</a><br>Ctrl-F5 may work better</div>')
-				$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.reload()">Refresh</a><br><div id="auto-refresh">Auto-refresh in 10</div><!--<br>Ctrl-F5 may work better--></div>')
+				$('body').html('<div id="notfound"><b>Image '+id+' not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.reload()">Refresh</a><br><div id="auto-refresh">Auto-refresh in 10</div><!--<br>Ctrl-F5 may work better--></div>')
 				var start=Date.now(), next=Date.now() + 10000, iv=setInterval(()=> {
 					// if(Date.now()-start > 300000){ $('#auto-refresh').html('Auto-refresh stopped after 5m'); clearInterval(iv) }
 					let when = (Date.now() - next) * -1;
