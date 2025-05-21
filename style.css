@@ -1,37 +1,50 @@
 body {
-    background-color: #202124 !important; /* Chrome's dark gray background */
+    background-color: rgb(14, 14, 14) !important; /* Chrome-like dark background */
     margin: 0;
-    height: 100vh;
+    padding:0;
+    min-height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     overflow: auto;
-    color: #e0e0e0;
+    font-family: Arial, sans-serif;
 }
 
-#header {
-    margin-bottom: 5px;
-}
-
-#footer {
-    margin-top: 5px;
-}
-
-#prompt {
-    font-size: 20px;
-    color: #e0e0e0;
+.container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
 }
 
-#model {
-    font-size: 12px;
-    color: #777;
-    text-align: right;
+.header {
+    color: #e0e0e0;
+    text-align: center;
+    margin-bottom: 8px;
+    width: 100%; /* Header can extend beyond image width */
+    font-size:20px;
+}
+
+.image-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 img {
     max-width: 100%;
-    max-height: 100vh;
-    object-fit: contain; /* Ensures image scales without distortion */
+    max-height: calc(100vh - 100px); /* Adjust for header/footer */
+    object-fit: contain; /* Scales image without distortion */
+    display: block;
+}
+
+.footer {
+    color: #666;
+    text-align: right;
+    margin-top: 2px;
+    width: 100%;
+    max-width: calc(100% - 20px); /* Matches image width, with small padding */
+    align-self: flex-end; /* Aligns footer to the right of the image */
+    font-size: 12px;
 }

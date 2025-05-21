@@ -1,4 +1,6 @@
-let userRepo = location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
+let userRepo
+if (location.pathname.indexOf("C:") !== -1) userRepo = 'img4/i' // local dev
+else userRepo = location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
 let id = location.search ? location.search.substring(1) : ''
 
 $(() => {
@@ -11,7 +13,8 @@ $(() => {
 			if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
 			$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
 			$('title').text(r.p)
-			$('body').append('<div id="single"><div id="header"><div id="prompt">' + r.p + '</div></div><img src="' + r.i + '" alt=""/><div id="footer"><div id="model">' + r.m + '</div></div></div>')
+			// $('body').append('<header>' + r.p + '</header><main><img src="' + r.i + '" alt=""/></main><footer>' + r.m + '</footer>')
+			$('body').append('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
 		})
 	} else { // view gallery, with modal images
 		console.log('init gallery')
