@@ -1,43 +1,92 @@
-let userRepo = location.pathname.indexOf("C:") !== -1 ?  'img4/i' /* local dev */ : location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
+let userRepo = location.pathname.indexOf("C:") !== -1 ? 'img4/i' /* local dev */ : location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
 let id = (location.search ? location.search.substring(1) : '').split('&')[0]
-let arInterval
+let lastIndex, arInterval
 
 $(() => {
-	// on load, view one image or gallery
-	if (id) { // one image
-		console.log('init single image')
-		// bind left and right keys to increase or decrease id
-		document.addEventListener('keydown', (e) => {
-			if (e.key === 'ArrowLeft'){
-				clearInterval(arInterval)
-				id = (parseInt(id, 36) - 1).toString(36)
-				if(id<1) id=1
-				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
-				initSingle(id)
-			}
-			else if (e.key === 'ArrowRight'){
-				clearInterval(arInterval)
-				id = (parseInt(id, 36) + 1).toString(36)
-				// TODO store index max in a file and use it to prevent massive overruns
-				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
-				initSingle(id)
-			}
-		});
-		initSingle(id)
-	} else { // gallery
-		console.log('init gallery')
-		// get latest image id from index
-		$.get('https://raw.githubusercontent.com/' + userRepo + '/HEAD/index')
-			.done(r => {
-				console.log('r:', r)
-			})
-	}
+	(async () => {
+		// get lastIndex and poll regularly
+		lastIndex = await getLastIndex()
+		setInterval(() => {
+			(async () => {
+				lastIndex = await getLastIndex(true)
+				// TODO when it increases, toast that there are new images
+			})()
+		}, 5000)
+
+		// on load, view one image or gallery
+		if (id) { // one image
+			console.log('init single image')
+			// bind left and right keys to increase or decrease id
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'ArrowLeft') {
+					clearInterval(arInterval)
+					id = (parseInt(id, 36) - 1).toString(36)
+					if (id < 1) id = 1
+					history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+					initSingle(id)
+				} else if (e.key === 'ArrowRight') {
+					(async () => {
+						if (!lastIndex) lastIndex = await getLastIndex()
+						let intId = parseInt(id, 36)
+						console.log('ArrowRight intId:', intId, ' lastIndex:', lastIndex, intId >= lastIndex ? ' aborting' : '')
+						if (intId >= lastIndex) return
+						clearInterval(arInterval)
+						id = (intId + 1).toString(36)
+						history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+						initSingle(id)
+					})()
+				}
+			});
+			initSingle(id)
+		} else { // gallery
+			console.log('init gallery')
+			// get latest image id from index
+			$.get('https://raw.githubusercontent.com/' + userRepo + '/HEAD/index')
+				.done(r => {
+					console.log('r:', r)
+				})
+		}
+	})()
 })
+
+async function getLastIndex(poll) {
+	return new Promise(re => {
+		let ls_lastIndex = localStorage.getItem('lastIndex')
+		let ls_lastIndexTime = localStorage.getItem('lastIndexTime')
+		if (Date.now() - parseInt(ls_lastIndexTime) <= 60000) {
+			console.log((poll ? '[poll] ' : '') + 'getLastIndex() cached =', ls_lastIndex)
+			return re(parseInt(ls_lastIndex))
+		}
+		$.get('https://api.github.com/repos/' + userRepo + '/commits?per_page=5', 'json')
+			.done(r => {
+				for (let i = 0; i < r.length; i++) {
+					if (r[i].commit.message.match(/^Result /)) {
+						let li = r[i].commit.message.split(' ')[1].toString()
+						console.log((poll ? '[poll] ' : '') + 'getLastIndex() refreshed =', li)
+						localStorage.setItem('lastIndex', li)
+						localStorage.setItem('lastIndexTime', Date.now().toString())
+						return re(parseInt(li))
+					}
+				}
+			})
+			.fail(err => {
+				console.log('getLastIndex() failed, err:', err)
+				let ls_lastIndex = localStorage.getItem('lastIndex')
+				if (ls_lastIndex) {
+					console.log('getLastIndex() failed, returning cached =', ls_lastIndex)
+					return re(parseInt(ls_lastIndex))
+				} else {
+					console.log('getLastIndex() fatal error, no lastIndex in cache. returning null')
+					return re(null)
+				}
+			})
+	})
+}
 
 // begin display for a single image. show it or auto-refresh
 function initSingle(id) {
 	(async () => {
-		console.log('initSingle('+id+')')
+		console.log('initSingle(' + id + ')')
 		let r, arStartTime, arWrap, refreshBtn
 		r = await getImageData(id)
 		if (r) showSingle(r)
@@ -71,7 +120,7 @@ function initSingle(id) {
 				refreshBtn.hide()
 				arWrap.show()
 				arStartTime = Date.now()
-				if(arInterval) clearInterval(arInterval)
+				if (arInterval) clearInterval(arInterval)
 				arInterval = setInterval(checkIt, 3000)
 				if (!first) checkIt()
 			}
@@ -99,7 +148,7 @@ function showSingle(r) {
 // get data from results hierarchy
 async function getImageData(id) {
 	return new Promise(re => {
-		console.log('getImageData('+id+')')
+		console.log('getImageData(' + id + ')')
 		let url = 'https://raw.githubusercontent.com/' + userRepo + '/HEAD/images/' + id[0] + '/' + (id.length > 1 ? id[1] : '0') + '/' + id + '?' + Date.now()
 		console.log('source url: ', url)
 		$.get(url)
