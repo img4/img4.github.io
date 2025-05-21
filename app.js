@@ -15,15 +15,15 @@ $(() => {
 				id = (parseInt(id, 36) - 1).toString(36)
 				if(id<1) id=1
 				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
-				loadPage(id)
+				loadSinglePage(id)
 			}
 			else if (e.key === 'ArrowRight'){
 				clearInterval(arInterval)
 				id = (parseInt(id, 36) + 1).toString(36)
 				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
-				loadPage(id)			}
+				loadSinglePage(id)			}
 		});
-		loadPage(id)
+		loadSinglePage(id)
 	} else { // view gallery, with modal images
 		console.log('init gallery')
 		// get latest image id
@@ -34,11 +34,11 @@ $(() => {
 	}
 })
 
-function loadPage(id) {
+function loadSinglePage(id) {
 	(async () => {
 		let r, arStartTime, arWrap, refreshBtn
-		r = await loadImageByID(id)
-		if (r) showImageResult(r)
+		r = await getImageData(id)
+		if (r) showSingleResult(r)
 		else {
 			console.log('image not found. start auto-refresh (id=' + id + ')')
 			$('body').html('<div id="notfound"><b>Image ' + id + ' not found</b><br>New images can take a few seconds to propagate<br><div id="auto-refresh-wrap">Auto-refreshing for 5m...<br><div class="spinner-border text-primary" role="status" style="margin-top:5px"><span class="visually-hidden">Loading...</span></div></div><a id="refresh-btn" class="btn btn-primary" style="display:none; margin-top:5px" >Refresh</a><br></div>')
@@ -54,10 +54,10 @@ function loadPage(id) {
 						arWrap.hide()
 						refreshBtn.show()
 					}
-					r = await loadImageByID(id)
+					r = await getImageData(id)
 					if (r) {
 						clearInterval(arInterval)
-						showImageResult(r)
+						showSingleResult(r)
 					}
 				})()
 			}
@@ -80,9 +80,9 @@ function loadPage(id) {
 	})()
 }
 
-async function loadImageByID(id) {
+async function getImageData(id) {
 	return new Promise(re => {
-		console.log('loadImageByID('+id+')')
+		console.log('getImageData('+id+')')
 		let url = 'https://raw.githubusercontent.com/' + userRepo + '/HEAD/images/' + id[0] + '/' + (id.length > 1 ? id[1] : '0') + '/' + id + '?' + Date.now()
 		console.log('source url: ', url)
 		$.get(url)
@@ -96,22 +96,22 @@ async function loadImageByID(id) {
 						"i": "..." (data uri)
 					}*/
 					data.p = b64Decode(data.p)
-					console.log('loadImageByID() got image data:', data)
+					console.log('getImageData() got image data:', data)
 					re(data)
 				} catch (e) {
-					console.log('loadImageByID() error: ' + e.message)
+					console.log('getImageData() error: ' + e.message)
 				}
 			})
 			.fail(() => {
-				console.log('loadImageByID() failed to get image data')
+				console.log('getImageData() failed to get image data')
 				re(false)
 			})
 	})
 }
 
-function showImageResult(r) {
+function showSingleResult(r) {
 	// show image
-	console.log('showImageResult()')
+	console.log('showSingleResult()')
 	let svcId = r.m.split('-')[0], iconId
 	if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
 	$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
