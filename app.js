@@ -24,7 +24,7 @@ $(() => {
 			}
 		});
 		initSingle(id)
-	} else { // view gallery, with modal images
+	} else { // view gallery
 		console.log('init gallery')
 		// get latest image id
 		$.get('https://raw.githubusercontent.com/' + userRepo + '/HEAD/index')
@@ -34,7 +34,7 @@ $(() => {
 	}
 })
 
-// first page load
+// begin display for a single image. show it or auto-refresh
 function initSingle(id) {
 	(async () => {
 		console.log('initSingle('+id+')')
@@ -83,7 +83,7 @@ function initSingle(id) {
 	})()
 }
 
-// show image without full page reload
+// show valid / found image
 function showSingle(r) {
 	console.log('showSingle()')
 	let svcId = r.m.split('-')[0], iconId
