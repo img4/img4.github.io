@@ -42,6 +42,7 @@ function initSingle(id) {
 		r = await getImageData(id)
 		if (r) showSingle(r)
 		else {
+			$('link[rel="icon"]').remove()
 			$('title').text('Not found')
 			console.log('image not found. start auto-refresh (id=' + id + ')')
 			$('body').html('<div id="notfound"><b>Image ' + id + ' not found</b><br>New images can take a few seconds to propagate<br><div id="auto-refresh-wrap">Auto-refreshing every 3s for 5m...<br><div class="spinner-border text-primary" role="status" style="margin-top:5px"><span class="visually-hidden">Loading...</span></div></div><a id="refresh-btn" class="btn btn-primary" style="display:none; margin-top:5px" >Refresh</a><br></div>')
