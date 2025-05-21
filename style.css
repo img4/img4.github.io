@@ -19,11 +19,11 @@ body {
 }
 
 .header {
-    color: #e0e0e0;
+    color: #c0c0c0;
     text-align: center;
     margin-bottom: 8px;
     width: 100%; /* Header can extend beyond image width */
-    font-size:20px;
+    font-size:18px;
 }
 
 .image-wrapper {
