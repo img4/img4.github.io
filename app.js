@@ -1,9 +1,13 @@
 let userRepo
 if (location.pathname.indexOf("C:") !== -1) userRepo = 'img4/i' // local dev
 else userRepo = location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
-let id = location.search ? location.search.substring(1) : ''
+let id = (location.search ? location.search.substring(1) : '').split('&')[0]
 
 $(() => {
+	// remove cache buster
+	if(location.search.indexOf('&')!==-1){
+		history.replaceState(null, '', location.href.split('&')[0]);
+	}
 	// on load, view one image or gallery
 	if (id) { // view one image, with link to gallery
 		// bind left and right keys to increase or decrease id
@@ -61,13 +65,13 @@ function loadImageByID(id, cb) {
 			}
 		})
 		.fail(() => {
-			$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:window.location.href=window.location.href">Refresh</a><br>Ctrl-F5 may work better</div>')
-			var start=Date.now()
-			var iv=setInterval(()=> {
-				if(Date.now()-start > 30000){ console.log('auto-refresh timeout, cancelling'); clearInterval(iv) }
-				console.log('auto-refresh')
-				window.location.href = window.location;
-			}, 2000)
+			$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.href=location.href.split(\'&\')[0]+\'&\'+Date.now()">Refresh</a><br>Ctrl-F5 may work better</div>')
+			// var start=Date.now()
+			// var iv=setInterval(()=> {
+			// 	if(Date.now()-start > 30000){ console.log('auto-refresh timeout, cancelling'); clearInterval(iv) }
+			// 	console.log('auto-refresh')
+			// 	window.location.href = window.location;
+			// }, 2000)
 		});
 }
 
