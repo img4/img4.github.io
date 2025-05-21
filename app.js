@@ -6,8 +6,21 @@ let id = location.search ? location.search.substring(1) : ''
 $(() => {
 	// on load, view one image or gallery
 	if (id) { // view one image, with link to gallery
+		// bind left and right keys to increase or decrease id
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'ArrowLeft'){
+				let prevId = (parseInt(id, 36) - 1).toString(36)
+				if(prevId<1) prevId=1
+				location = location.origin + location.pathname + '?' + prevId
+			}
+			else if (e.key === 'ArrowRight'){
+				let nextId = (parseInt(id, 36) + 1).toString(36)
+				location = location.origin + location.pathname + '?' + nextId
+			}
+		});
 		console.log('init single image')
 		loadImageByID(id, r => {
+			// show image
 			console.log('show image')
 			let svcId = r.m.split('-')[0], iconId
 			if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
