@@ -96,7 +96,7 @@ function initSingle(id) {
 			// if found image has id greater than lastIndex, update lastIndex. this provides functionality before the regular polling that will soon find it
 			let intId = parseInt(id, 36)
 			if (intId > lastIndex) {
-				console.log('found id greater than lastIndex, updating lastIndex early')
+				console.log('found id ' + intId + ' > lastIndex ' + lastIndex + ', updating')
 				lastIndex = intId
 				localStorage.setItem('lastIndex', lastIndex.toString())
 				localStorage.setItem('lastIndexTime', Date.now().toString())
