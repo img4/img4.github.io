@@ -44,11 +44,7 @@ $(() => {
 			initSingle(id)
 		} else { // gallery
 			console.log('init gallery')
-			// get latest image id from index
-			$.get('https://raw.githubusercontent.com/' + userRepo + '/HEAD/index')
-				.done(r => {
-					console.log('r:', r)
-				})
+			// TODO
 		}
 	})()
 })
