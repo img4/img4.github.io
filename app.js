@@ -4,7 +4,7 @@ let arInterval
 
 $(() => {
 	// on load, view one image or gallery
-	if (id) { // view one image, with link to gallery
+	if (id) { // one image
 		console.log('init single image')
 		// bind left and right keys to increase or decrease id
 		document.addEventListener('keydown', (e) => {
@@ -18,7 +18,7 @@ $(() => {
 			else if (e.key === 'ArrowRight'){
 				clearInterval(arInterval)
 				id = (parseInt(id, 36) + 1).toString(36)
-				// TODO store index max in a file and use it
+				// TODO store index max in a file and use it to prevent massive overruns
 				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
 				initSingle(id)
 			}
@@ -34,6 +34,7 @@ $(() => {
 	}
 })
 
+// first page load
 function initSingle(id) {
 	(async () => {
 		console.log('initSingle('+id+')')
@@ -74,6 +75,7 @@ function initSingle(id) {
 			}
 
 			autoRefreshStart(true)
+
 			refreshBtn.click(function () {
 				autoRefreshStart()
 			})
@@ -81,8 +83,8 @@ function initSingle(id) {
 	})()
 }
 
+// show image without full page reload
 function showSingle(r) {
-	// show image
 	console.log('showSingle()')
 	let svcId = r.m.split('-')[0], iconId
 	if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
@@ -91,6 +93,7 @@ function showSingle(r) {
 	$('body').html('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
 }
 
+// get data from results hierarchy
 async function getImageData(id) {
 	return new Promise(re => {
 		console.log('getImageData('+id+')')
@@ -101,10 +104,11 @@ async function getImageData(id) {
 				if (!r) re(false)
 				try {
 					data = JSON.parse(r)
-					/*{ // service, model, prompt, type, image data
+					/*{ // service, model, prompt, type, image data, unix timestamp (secs)
 						"m": "imagen-3-generate-002",
 						"p": "funny picture of a shrew", (b64)
 						"i": "..." (data uri)
+						"t": 123456789
 					}*/
 					data.p = b64Decode(data.p)
 					console.log('getImageData() got image data:', data)
@@ -120,9 +124,10 @@ async function getImageData(id) {
 	})
 }
 
+// proper base64 decode https://tinyurl.com/atob5
 function b64Decode(r) {
 	if (!r) return '' // tmp due to missing .p
-	const bs = atob(r); // https://tinyurl.com/atob5
+	const bs = atob(r);
 	const b = new Uint8Array(bs.length);
 	for (let i = 0; i < bs.length; i++) b[i] = bs.charCodeAt(i);
 	return new TextDecoder().decode(b);
