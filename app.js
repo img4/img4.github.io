@@ -8,8 +8,12 @@ $(() => {
 		lastIndex = await getLastIndex()
 		setInterval(() => {
 			(async () => {
+				let oldIndex = lastIndex
 				lastIndex = await getLastIndex(true)
 				// TODO when it increases, toast that there are new images
+				if(lastIndex > oldIndex) {
+					console.log('[poll] lastIndex > oldIndex = new images')
+				}
 			})()
 		}, 5000)
 
