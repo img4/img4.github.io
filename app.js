@@ -2,43 +2,28 @@ let userRepo
 if (location.pathname.indexOf("C:") !== -1) userRepo = 'img4/i' // local dev
 else userRepo = location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
 let id = (location.search ? location.search.substring(1) : '').split('&')[0]
+let arInterval
 
 $(() => {
 	// on load, view one image or gallery
 	if (id) { // view one image, with link to gallery
+		console.log('init single image')
 		// bind left and right keys to increase or decrease id
 		document.addEventListener('keydown', (e) => {
 			if (e.key === 'ArrowLeft'){
-				let prevId = (parseInt(id, 36) - 1).toString(36)
-				if(prevId<1) prevId=1
-				location = location.origin + location.pathname + '?' + prevId
+				clearInterval(arInterval)
+				id = (parseInt(id, 36) - 1).toString(36)
+				if(id<1) id=1
+				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
+				loadPage(id)
 			}
 			else if (e.key === 'ArrowRight'){
-				let nextId = (parseInt(id, 36) + 1).toString(36)
-				location = location.origin + location.pathname + '?' + nextId
-			}
+				clearInterval(arInterval)
+				id = (parseInt(id, 36) + 1).toString(36)
+				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
+				loadPage(id)			}
 		});
-		console.log('init single image')
-		loadImageByID(id, r => {
-			if(r!==false) {
-				// show image
-				console.log('show image')
-				let svcId = r.m.split('-')[0], iconId
-				if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
-				$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
-				$('title').text(r.p)
-				$('body').append('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
-			} else {
-				$('body').html('<div id="notfound"><b>Image '+id+' not found</b><br>New images can take a few seconds to propagate<br><a class="btn btn-primary" href="javascript:location.reload()">Refresh</a><br><div id="auto-refresh">Auto-refresh in 10</div><br><!--⬅ Navigate with arrow keys ➡--></div>')
-				var start=Date.now(), next=Date.now() + 10000, iv=setInterval(()=> {
-					// if(Date.now()-start > 300000){ $('#auto-refresh').html('Auto-refresh stopped after 5m'); clearInterval(iv) }
-					let when = (Date.now() - next) * -1;
-					// console.log('when:',when)
-					if(when<=0)	return location.reload()
-					$('#auto-refresh').html('Auto-refresh in ' + Math.ceil(when/1000).toString());
-				}, 200)
-			}
-		})
+		loadPage(id)
 	} else { // view gallery, with modal images
 		console.log('init gallery')
 		// get latest image id
@@ -49,28 +34,89 @@ $(() => {
 	}
 })
 
-function loadImageByID(id, cb) {
-	let url = 'https://raw.githubusercontent.com/' + userRepo + '/HEAD/images/' + id[0] + '/' + (id.length > 1 ? id[1] : '0') + '/' + id + '?' + Date.now()
-	console.log('source url: ', url)
-	$.get(url)
-		.done(r => {
-			try {
-				data = JSON.parse(r)
-				/*{ // service, model, prompt, type, image data
-					"m": "imagen-3-generate-002",
-					"p": "funny picture of a shrew", (b64)
-					"i": "..." (data uri)
-				}*/
-				data.p = b64Decode(data.p)
-				console.log('image data:', data)
-				cb(data)
-			} catch (e) {
-				console.log('loadImageByID() error: ' + e.message)
+function loadPage(id) {
+	(async () => {
+		let r, arStartTime, arWrap, refreshBtn
+		r = await loadImageByID(id)
+		if (r) showImageResult(r)
+		else {
+			console.log('image not found. start auto-refresh (id=' + id + ')')
+			$('body').html('<div id="notfound"><b>Image ' + id + ' not found</b><br>New images can take a few seconds to propagate<br><div id="auto-refresh-wrap">Auto-refreshing for 5m...<br><div class="spinner-border text-primary" role="status" style="margin-top:5px"><span class="visually-hidden">Loading...</span></div></div><a id="refresh-btn" class="btn btn-primary" style="display:none; margin-top:5px" >Refresh</a><br></div>')
+			arWrap = $('#auto-refresh-wrap')
+			refreshBtn = $('#refresh-btn')
+
+			let checkIt = function () {
+				(async () => {
+					console.log('checkIt(' + id + ')')
+					if (Date.now() - arStartTime > 300000) {
+						console.log('auto-refresh timeout, showing restart button')
+						clearInterval(arInterval)
+						arWrap.hide()
+						refreshBtn.show()
+					}
+					r = await loadImageByID(id)
+					if (r) {
+						clearInterval(arInterval)
+						showImageResult(r)
+					}
+				})()
 			}
-		})
-		.fail(() => {
-			cb(false)
-		});
+
+			function autoRefreshStart(first) {
+				console.log('autoRefreshStart(' + id + ')')
+				refreshBtn.hide()
+				arWrap.show()
+				arStartTime = Date.now()
+				if(arInterval) clearInterval(arInterval)
+				arInterval = setInterval(checkIt, 3000)
+				if (!first) checkIt()
+			}
+
+			autoRefreshStart(true)
+			refreshBtn.click(function () {
+				autoRefreshStart()
+			})
+		}
+	})()
+}
+
+async function loadImageByID(id) {
+	return new Promise(re => {
+		console.log('loadImageByID('+id+')')
+		let url = 'https://raw.githubusercontent.com/' + userRepo + '/HEAD/images/' + id[0] + '/' + (id.length > 1 ? id[1] : '0') + '/' + id + '?' + Date.now()
+		console.log('source url: ', url)
+		$.get(url)
+			.done(r => {
+				if (!r) re(false)
+				try {
+					data = JSON.parse(r)
+					/*{ // service, model, prompt, type, image data
+						"m": "imagen-3-generate-002",
+						"p": "funny picture of a shrew", (b64)
+						"i": "..." (data uri)
+					}*/
+					data.p = b64Decode(data.p)
+					console.log('loadImageByID() got image data:', data)
+					re(data)
+				} catch (e) {
+					console.log('loadImageByID() error: ' + e.message)
+				}
+			})
+			.fail(() => {
+				console.log('loadImageByID() failed to get image data')
+				re(false)
+			})
+	})
+}
+
+function showImageResult(r) {
+	// show image
+	console.log('showImageResult()')
+	let svcId = r.m.split('-')[0], iconId
+	if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
+	$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
+	$('title').text(r.p)
+	$('body').html('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
 }
 
 function b64Decode(r) {
