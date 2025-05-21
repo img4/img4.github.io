@@ -18,8 +18,10 @@ $(() => {
 			else if (e.key === 'ArrowRight'){
 				clearInterval(arInterval)
 				id = (parseInt(id, 36) + 1).toString(36)
+				// TODO store index max in a file and use it
 				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
-				initSingle(id)			}
+				initSingle(id)
+			}
 		});
 		initSingle(id)
 	} else { // view gallery, with modal images
