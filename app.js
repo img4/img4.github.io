@@ -26,13 +26,25 @@ $(() => {
 		});
 		console.log('init single image')
 		loadImageByID(id, r => {
-			// show image
-			console.log('show image')
-			let svcId = r.m.split('-')[0], iconId
-			if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
-			$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
-			$('title').text(r.p)
-			$('body').append('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
+			if(r!==false) {
+				// show image
+				console.log('show image')
+				let svcId = r.m.split('-')[0], iconId
+				if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
+				$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
+				$('title').text(r.p)
+				$('body').append('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
+			} else {
+				// $('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.href=location.href.split(\'&\')[0]+\'&\'+Date.now()">Refresh</a><br>Ctrl-F5 may work better</div>')
+				$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.reload()">Refresh</a><br><div id="auto-refresh">Auto-refresh in 10</div><!--<br>Ctrl-F5 may work better--></div>')
+				var start=Date.now(), next=Date.now() + 10000, iv=setInterval(()=> {
+					// if(Date.now()-start > 300000){ $('#auto-refresh').html('Auto-refresh stopped after 5m'); clearInterval(iv) }
+					let when = (Date.now() - next) * -1;
+					// console.log('when:',when)
+					if(when<=0)	return location.reload()
+					$('#auto-refresh').html('Auto-refresh in ' + Math.ceil(when/1000).toString());
+				}, 200)
+			}
 		})
 	} else { // view gallery, with modal images
 		console.log('init gallery')
@@ -69,14 +81,7 @@ function loadImageByID(id, cb) {
 			}
 		})
 		.fail(() => {
-			// $('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.href=location.href.split(\'&\')[0]+\'&\'+Date.now()">Refresh</a><br>Ctrl-F5 may work better</div>')
-			$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.reload()">Refresh</a><!--<br>Ctrl-F5 may work better--></div>')
-			// var start=Date.now()
-			// var iv=setInterval(()=> {
-			// 	if(Date.now()-start > 30000){ console.log('auto-refresh timeout, cancelling'); clearInterval(iv) }
-			// 	console.log('auto-refresh')
-			// 	window.location.href = window.location;
-			// }, 2000)
+			cb(false)
 		});
 }
 
