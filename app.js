@@ -2,10 +2,12 @@ let userRepo
 if (location.pathname.indexOf("C:") !== -1) userRepo = 'img4/i' // local dev
 else userRepo = location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
 let id = (location.search ? location.search.substring(1) : '').split('&')[0]
+let cacheBusting
 
 $(() => {
-	// remove cache buster
+	// remove cache buster from address bar
 	if(location.search.indexOf('&')!==-1){
+		cacheBusting=true
 		history.replaceState(null, '', location.href.split('&')[0]);
 	}
 	// on load, view one image or gallery
@@ -44,6 +46,7 @@ $(() => {
 
 function loadImageByID(id, cb) {
 	let url = 'https://raw.githubusercontent.com/' + userRepo + '/HEAD/images/' + id[0] + '/' + (id.length > 1 ? id[1] : '0') + '/' + id
+	if(cacheBusting) url += '?' + Date.now()
 	console.log('source url: ', url)
 	$.get(url)
 		.done(r => {
