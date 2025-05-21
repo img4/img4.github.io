@@ -15,15 +15,15 @@ $(() => {
 				id = (parseInt(id, 36) - 1).toString(36)
 				if(id<1) id=1
 				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
-				loadSinglePage(id)
+				initSinglePage(id)
 			}
 			else if (e.key === 'ArrowRight'){
 				clearInterval(arInterval)
 				id = (parseInt(id, 36) + 1).toString(36)
 				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
-				loadSinglePage(id)			}
+				initSinglePage(id)			}
 		});
-		loadSinglePage(id)
+		initSinglePage(id)
 	} else { // view gallery, with modal images
 		console.log('init gallery')
 		// get latest image id
@@ -34,8 +34,9 @@ $(() => {
 	}
 })
 
-function loadSinglePage(id) {
+function initSinglePage(id) {
 	(async () => {
+		console.log('initSinglePage('+id+')')
 		let r, arStartTime, arWrap, refreshBtn
 		r = await getImageData(id)
 		if (r) showSingleResult(r)
