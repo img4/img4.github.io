@@ -61,7 +61,7 @@ function loadImageByID(id, cb) {
 			}
 		})
 		.fail(() => {
-			$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.reload();">Refresh</a></div>') // TODO link gallery, or forward automatically
+			$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:window.location.href=window.location.href">Refresh</a></div>') // TODO link gallery, or forward automatically
 		});
 }
 
