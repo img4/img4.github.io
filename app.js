@@ -1,6 +1,4 @@
-let userRepo
-if (location.pathname.indexOf("C:") !== -1) userRepo = 'img4/i' // local dev
-else userRepo = location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
+let userRepo = location.pathname.indexOf("C:") !== -1 ?  'img4/i' /* local dev */ : location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
 let id = (location.search ? location.search.substring(1) : '').split('&')[0]
 let arInterval
 
@@ -15,15 +13,15 @@ $(() => {
 				id = (parseInt(id, 36) - 1).toString(36)
 				if(id<1) id=1
 				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
-				initSinglePage(id)
+				initSingle(id)
 			}
 			else if (e.key === 'ArrowRight'){
 				clearInterval(arInterval)
 				id = (parseInt(id, 36) + 1).toString(36)
 				history.replaceState(null,null,location.origin + location.pathname + '?' + id)
-				initSinglePage(id)			}
+				initSingle(id)			}
 		});
-		initSinglePage(id)
+		initSingle(id)
 	} else { // view gallery, with modal images
 		console.log('init gallery')
 		// get latest image id
@@ -34,12 +32,12 @@ $(() => {
 	}
 })
 
-function initSinglePage(id) {
+function initSingle(id) {
 	(async () => {
-		console.log('initSinglePage('+id+')')
+		console.log('initSingle('+id+')')
 		let r, arStartTime, arWrap, refreshBtn
 		r = await getImageData(id)
-		if (r) showSingleResult(r)
+		if (r) showSingle(r)
 		else {
 			console.log('image not found. start auto-refresh (id=' + id + ')')
 			$('body').html('<div id="notfound"><b>Image ' + id + ' not found</b><br>New images can take a few seconds to propagate<br><div id="auto-refresh-wrap">Auto-refreshing for 5m...<br><div class="spinner-border text-primary" role="status" style="margin-top:5px"><span class="visually-hidden">Loading...</span></div></div><a id="refresh-btn" class="btn btn-primary" style="display:none; margin-top:5px" >Refresh</a><br></div>')
@@ -58,7 +56,7 @@ function initSinglePage(id) {
 					r = await getImageData(id)
 					if (r) {
 						clearInterval(arInterval)
-						showSingleResult(r)
+						showSingle(r)
 					}
 				})()
 			}
@@ -110,9 +108,9 @@ async function getImageData(id) {
 	})
 }
 
-function showSingleResult(r) {
+function showSingle(r) {
 	// show image
-	console.log('showSingleResult()')
+	console.log('showSingle()')
 	let svcId = r.m.split('-')[0], iconId
 	if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
 	$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
