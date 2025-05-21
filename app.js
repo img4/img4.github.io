@@ -61,7 +61,13 @@ function loadImageByID(id, cb) {
 			}
 		})
 		.fail(() => {
-			$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:window.location.href=window.location.href">Refresh</a><br>Ctrl-F5 may work better</div>') // TODO link gallery, or forward automatically
+			$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:window.location.href=window.location.href">Refresh</a><br>Ctrl-F5 may work better</div>')
+			var start=Date.now()
+			var iv=setInterval(()=> {
+				if(Date.now()-start > 30000){ console.log('auto-refresh timeout, cancelling'); clearInterval(iv) }
+				console.log('auto-refresh')
+				window.location.href = window.location;
+			}, 2000)
 		});
 }
 
