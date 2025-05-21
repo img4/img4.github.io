@@ -46,7 +46,8 @@ $(() => {
 
 function loadImageByID(id, cb) {
 	let url = 'https://raw.githubusercontent.com/' + userRepo + '/HEAD/images/' + id[0] + '/' + (id.length > 1 ? id[1] : '0') + '/' + id
-	if(cacheBusting) url += '?' + Date.now()
+	// if(cacheBusting) url += '?' + Date.now()
+	url += '?' + Date.now()
 	console.log('source url: ', url)
 	$.get(url)
 		.done(r => {
@@ -68,7 +69,8 @@ function loadImageByID(id, cb) {
 			}
 		})
 		.fail(() => {
-			$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.href=location.href.split(\'&\')[0]+\'&\'+Date.now()">Refresh</a><br>Ctrl-F5 may work better</div>')
+			// $('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.href=location.href.split(\'&\')[0]+\'&\'+Date.now()">Refresh</a><br>Ctrl-F5 may work better</div>')
+			$('body').html('<div id="notfound"><b>Image not found</b><br>New images can take a few seconds<br><a class="btn btn-primary" href="javascript:location.reload()">Refresh</a><br>Ctrl-F5 may work better</div>')
 			// var start=Date.now()
 			// var iv=setInterval(()=> {
 			// 	if(Date.now()-start > 30000){ console.log('auto-refresh timeout, cancelling'); clearInterval(iv) }
