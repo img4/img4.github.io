@@ -26,9 +26,8 @@ $(() => {
 					initSingle(id)
 				} else if (e.key === 'ArrowRight') {
 					(async () => {
-						if (!lastIndex) lastIndex = await getLastIndex()
 						let intId = parseInt(id, 36)
-						console.log('ArrowRight intId:', intId, ' lastIndex:', lastIndex, intId >= lastIndex ? ' aborting' : '')
+						console.log('ArrowRight intId:', intId, 'lastIndex:', lastIndex, intId >= lastIndex ? 'aborting' : '')
 						if (intId >= lastIndex) return
 						clearInterval(arInterval)
 						id = (intId + 1).toString(36)
