@@ -1,10 +1,11 @@
-let userRepo = location.pathname.indexOf("C:") !== -1 ? 'img4/i' /* local dev */ : location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
+let userRepo = location.pathname.indexOf("/d/code") !== -1 ? 'img4/i' /* local dev */ : location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
 let id = (location.search ? location.search.substring(1) : '').split('&')[0]
 let lastIndex, arInterval
 
 $(() => {
 	(async () => {
 		// get lastIndex and poll regularly
+		// TODO pause polling when not focused
 		lastIndex = await getLastIndex()
 		setInterval(() => {
 			(async () => {
@@ -52,6 +53,8 @@ $(() => {
 	})()
 })
 
+// store highest image id so know where to browse, e.g. with arrow keys or paging or next buttons, and where to start gallery
+// value obtained by parsing commit messages for e.g. 'Result 123'. unauthed rate limit 60/h
 async function getLastIndex(poll) {
 	return new Promise(re => {
 		let ls_lastIndex = localStorage.getItem('lastIndex')
@@ -86,7 +89,7 @@ async function getLastIndex(poll) {
 	})
 }
 
-// begin display for a single image. show it or auto-refresh
+// begin display for a single image. show or auto-refresh
 function initSingle(id) {
 	(async () => {
 		console.log('initSingle(' + id + ')')
