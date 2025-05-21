@@ -11,7 +11,7 @@ $(() => {
 				let oldIndex = lastIndex
 				lastIndex = await getLastIndex(true)
 				// TODO when it increases, toast that there are new images
-				if(lastIndex > oldIndex) {
+				if (lastIndex > oldIndex) {
 					console.log('[poll] lastIndex > oldIndex = new images')
 				}
 			})()
@@ -92,8 +92,17 @@ function initSingle(id) {
 		console.log('initSingle(' + id + ')')
 		let r, arStartTime, arWrap, refreshBtn
 		r = await getImageData(id)
-		if (r) showSingle(r)
-		else {
+		if (r) {
+			// if found image has id greater than lastIndex, update lastIndex. this provides functionality before the regular polling that will soon find it
+			let intId = parseInt(id, 36)
+			if (intId > lastIndex) {
+				console.log('found id greater than lastIndex, updating lastIndex early')
+				lastIndex = intId
+				localStorage.setItem('lastIndex', lastIndex.toString())
+				localStorage.setItem('lastIndexTime', Date.now().toString())
+			}
+			showSingle(r)
+		} else {
 			$('link[rel="icon"]').remove()
 			$('title').text('Not found')
 			console.log('image not found. start auto-refresh (id=' + id + ')')
