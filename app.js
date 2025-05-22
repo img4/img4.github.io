@@ -198,7 +198,7 @@ function initSingle(id) {
 		// $('#nav-page-curitem').html(searchData.findIndex(item => item['id'] === id) + 1);
 		$('#nav-page-curitem').html(parseInt(id, 36));
 		if (r) {
-			// if found image has id greater than lastIndex, update lastIndex. this provides functionality before the regular polling that will soon find it
+			// if found image has id greater than lastIndex, update lastIndex. this provides functionality before the regular polling that will soon find it, or if rate limited
 			let intId = parseInt(id, 36)
 			if (intId > lastIndex) {
 				console.log('found id ' + intId + ' > lastIndex ' + lastIndex + ', updating')
