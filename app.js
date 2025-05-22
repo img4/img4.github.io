@@ -1,9 +1,52 @@
 let userRepo = location.pathname.indexOf("/d/code") !== -1 ? 'img4/i' /* local dev */ : location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
 let id = (location.search ? location.search.substring(1) : '').split('&')[0]
-let lastIndex, arInterval
+let lastIndex, searchData, arInterval
 
 $(() => {
 	(async () => {
+		searchData = await getSearchData()
+		setInterval(() => {
+			(async () => {
+				searchData = await getSearchData(true)
+			})()
+		}, 120000)
+
+		// activate search box
+		function fuzzyMatch(str, query) {
+			const strWords = str.toLowerCase().split(/\s+/);
+			const queryWords = query.toLowerCase().trim().split(/\s+/);
+			// Every query word must be a substring of some word in str
+			return queryWords.every(qWord =>
+				strWords.some(sWord => sWord.includes(qWord))
+			);
+		}
+		$('#search-input').autocomplete({
+			source: function(request, response) {
+				const term = request.term.toLowerCase();
+				const matches = searchData
+					.filter(item => item.p.toLowerCase().includes(term) || fuzzyMatch(item.p, term))
+					.map(item => ({
+						label: item.p,
+						value: item.p,
+						id: item.id
+					}));
+				// console.log('Search query:', term, 'Matches:', matches);
+				response(matches);
+			},
+			minLength: 1,
+			select: function(event, ui) {
+				// console.log('Selected item ID:', ui.item.id);
+				initSingle(ui.item.id)
+			},
+			close: ()=>{
+				$('#search-input').val('')
+				console.log('arf')
+			},
+			open: function(event, ui) {
+				// console.log('Dropdown opened with items:', $(this).autocomplete('widget').find('.ui-menu-item').length);
+			}
+		});
+
 		// get lastIndex and poll regularly
 		// TODO pause polling when not focused
 		lastIndex = await getLastIndex()
@@ -16,7 +59,7 @@ $(() => {
 					console.log('[poll] lastIndex > oldIndex = new images')
 				}
 			})()
-		}, 5000)
+		}, 15000)
 
 		// on load, view one image or gallery
 		if (id) { // one image
@@ -53,11 +96,11 @@ $(() => {
 // value obtained by parsing commit messages for e.g. 'Result 123'. unauthed rate limit 60/h
 async function getLastIndex(poll) {
 	return new Promise(re => {
-		let ls_lastIndex = localStorage.getItem('lastIndex')
-		let ls_lastIndexTime = localStorage.getItem('lastIndexTime')
-		if (Date.now() - parseInt(ls_lastIndexTime) <= 60000) {
-			console.log((poll ? '[poll] ' : '') + 'getLastIndex() cached =', ls_lastIndex)
-			return re(parseInt(ls_lastIndex))
+		let li = localStorage.getItem('lastIndex')
+		let lit = localStorage.getItem('lastIndexTime')
+		if (li && Date.now() - parseInt(lit) <= 60000) {
+			console.log((poll ? '[poll] ' : '') + 'getLastIndex() cached =', li)
+			return re(parseInt(li))
 		}
 		$.get('https://api.github.com/repos/' + userRepo + '/commits?per_page=5', 'json')
 			.done(r => {
@@ -71,14 +114,65 @@ async function getLastIndex(poll) {
 					}
 				}
 			})
-			.fail(err => {
-				console.log('getLastIndex() failed, err:', err)
-				let ls_lastIndex = localStorage.getItem('lastIndex')
-				if (ls_lastIndex) {
-					console.log('getLastIndex() failed, returning cached =', ls_lastIndex)
-					return re(parseInt(ls_lastIndex))
+			.fail(e => {
+				console.log('getLastIndex() failed, e:', e)
+				let li = localStorage.getItem('lastIndex')
+				if (li) {
+					console.log('getLastIndex() failed, returning cached =', li)
+					return re(parseInt(li))
 				} else {
 					console.log('getLastIndex() fatal error, no lastIndex in cache. returning null')
+					return re(null)
+				}
+			})
+	})
+}
+
+// get search data, stored compressed
+async function getSearchData(poll) {
+	return new Promise(re => {
+		let sd = localStorage.getItem('searchData')
+		let sdt = localStorage.getItem('searchDataTime')
+		if (sd && Date.now() - parseInt(sdt) <= 60000) {
+			sd = LZString.decompressFromBase64(sd)
+			sd = JSON.parse(sd)
+			console.log((poll ? '[poll] ' : '') + 'getSearchData() cached =', sd)
+			return re(sd)
+		}
+		$.get('https://raw.githubusercontent.com/' + userRepo + '/HEAD/search.json.lz')
+			.done(sd => {
+				try {
+					localStorage.setItem('searchData', sd)
+					localStorage.setItem('searchDataTime', Date.now().toString())
+					sd = LZString.decompressFromBase64(sd);
+					sd = JSON.parse(sd);
+					console.log((poll ? '[poll] ' : '') + 'getSearchData() refreshed =', sd)
+					return re(sd)
+				} catch (e) {
+					// document.getElementById('output').innerText = "Decompressed data (not JSON): " + decompressed;
+					console.error("getSearchData() error:", e);
+					sd = localStorage.getItem('searchData')
+					if (sd) {
+						sd = LZString.decompressFromBase64(sd);
+						sd = JSON.parse(sd);
+						console.log('getSearchData() failed, returning cached =', sd)
+						return re(sd)
+					} else {
+						console.log('getSearchData() fatal error, no searchData in cache. returning null')
+						return re(null)
+					}
+				}
+			})
+			.fail(e => {
+				console.log('getSearchData() dl failed, e:', e)
+				let sd = localStorage.getItem('searchData')
+				if (sd) {
+					sd = LZString.decompressFromBase64(sd)
+					sd = JSON.parse(sd)
+					console.log('getSearchData() dl failed, returning cached =', sd)
+					return re(sd)
+				} else {
+					console.log('getSearchData() fatal error, no searchData in cache. returning null')
 					return re(null)
 				}
 			})
@@ -105,7 +199,7 @@ function initSingle(id) {
 			$('link[rel="icon"]').remove()
 			$('title').text('Not found')
 			console.log('image not found. start auto-refresh (id=' + id + ')')
-			$('body').html('<div id="notfound"><b>Image ' + id + ' not found</b><br>New images can take a few seconds to propagate<br><div id="auto-refresh-wrap">Auto-refreshing every 3s for 5m...<br><div class="spinner-border text-primary" role="status" style="margin-top:5px"><span class="visually-hidden">Loading...</span></div></div><a id="refresh-btn" class="btn btn-primary" style="display:none; margin-top:5px" >Refresh</a><br></div>')
+			$('#main').html('<div id="notfound"><b>Image ' + id + ' not found</b><br>New images can take a few seconds to propagate<br><div id="auto-refresh-wrap">Auto-refreshing every 3s for 5m...<br><div class="spinner-border text-primary" role="status" style="margin-top:5px"><span class="visually-hidden">Loading...</span></div></div><a id="refresh-btn" class="btn btn-primary" style="display:none; margin-top:5px" >Refresh</a><br></div>')
 			arWrap = $('#auto-refresh-wrap')
 			refreshBtn = $('#refresh-btn')
 
@@ -153,7 +247,7 @@ function showSingle(r) {
 	$('link[rel="icon"]').remove()
 	$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
 	$('title').text(r.p)
-	$('body').html('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
+	$('#main').html('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
 }
 
 // get data from results hierarchy

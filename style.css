@@ -15,6 +15,50 @@ a, a:hover, a:visited {
     color: #c0c0c0;
 }
 
+/* top nav */
+ .navbar {
+     height: 50px;
+     overflow:hidden;
+     padding: 0.2rem 0.2rem;
+     /*background-color: rgb(55, 55, 55); !* Slightly lighter than rgb(14, 14, 14) *!*/
+     border-bottom: 1px solid #333;
+     z-index:-999;
+}
+
+.navbar-brand {
+}
+.nav-tip {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+.nav-sides-wrap {
+    width: 200px;
+    color: #6c757d;
+}
+
+/* jQuery UI Autocomplete dropdown styles */
+.ui-autocomplete {
+    z-index: 2002 !important; /* Higher than container */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    /*max-height: 200px;*/
+    /*overflow-y: auto;*/
+    /*width: 100%;*/
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /*position: absolute;*/
+    /*top: 100%; !* Align below input *!*/
+    /*left: 0;*/
+}
+.ui-menu-item {
+    /*padding: 8px;*/
+    cursor: pointer;
+}
+.ui-menu-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* view single */
 #notfound {
     line-height:28px;
     color: #c0c0c0;
@@ -48,7 +92,7 @@ a, a:hover, a:visited {
 
 img {
     max-width: 100%;
-    max-height: calc(100vh - 100px); /* Adjust for header/footer */
+    max-height: calc(100vh - 190px); /* Adjust for header/footer */
     object-fit: contain; /* Scales image without distortion */
     display: block;
 }
