@@ -118,7 +118,7 @@ async function getLastIndex(poll) {
 						console.log((poll ? '[poll] ' : '') + 'getLastIndex() refreshed =', li)
 						localStorage.setItem('lastIndex', li)
 						localStorage.setItem('lastIndexTime', Date.now().toString())
-						$('#nav-page-nitems').html = li;
+						$('#nav-page-nitems').html(li)
 						return re(parseInt(li))
 					}
 				}
@@ -204,7 +204,7 @@ function initSingle(id) {
 				lastIndex = intId
 				localStorage.setItem('lastIndex', lastIndex.toString())
 				localStorage.setItem('lastIndexTime', Date.now().toString())
-				$('#nav-page-nitems').html = lastIndex;
+				$('#nav-page-nitems').html(lastIndex)
 			}
 			showSingle(r)
 		} else {
