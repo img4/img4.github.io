@@ -309,6 +309,7 @@ function singlePagingInit() {
 	$('#nav-middle').html('<ul class="pagination pagination-sm m-0"><li class="page-item"><a id="page-single-prev" class="page-link clickable">«</a></li><li class="page-item"><a class="page-link" style="color:#c0c0c0; pointer-events: none;"><span id="nav-page-curitem">' + i + '</span> of <span id="nav-page-nitems">' + nItems + '</span></a></li><li class="page-item"><a id="page-single-next" class="page-link clickable">»</a></li></ul>')
 	$('#page-single-prev').click(singlePagingPrev)
 	$('#page-single-next').click(singlePagingNext)
+	// $('#nav-page-nitems').click(singlePagingLast)
 }
 
 // TODO use searchData for all next/prev operations so nothing breaks when items dont exist
@@ -329,6 +330,13 @@ function singlePagingNext() {
 	history.replaceState(null, null, location.origin + location.pathname + '?' + id)
 	initSingle(id)
 }
+
+// function singlePagingLast() {
+// 	clearInterval(arInterval)
+// 	id = lastIndex.toString(36)
+// 	history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+// 	initSingle(id)
+// }
 
 // proper base64 decode https://tinyurl.com/atob5
 function b64Decode(r) {
