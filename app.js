@@ -43,6 +43,7 @@ $(() => {
 				setTimeout(() => {
 					$('#search-input').val('')
 				}, 0)
+				if($('#nav-middle').html()==="") singlePagingInit()
 				return false // dont set long value
 			},
 			close: () => {
@@ -70,7 +71,7 @@ $(() => {
 		// on load, view one image or gallery
 		if (id) { // one image
 			console.log('init single image')
-			singlePagingInit(id)
+			singlePagingInit()
 			// bind left and right keys to increase or decrease id
 			document.addEventListener('keydown', (e) => {
 				if (e.key === 'ArrowLeft') {
@@ -299,7 +300,7 @@ async function getImageData(id) {
 
 // update paging in the header (single view)
 // use searchData to only count valid pages
-function singlePagingInit(id) {
+function singlePagingInit() {
 	// << < 12 of 123 > >>
 	// let nItems = searchData.length
 	// let i = searchData.findIndex(item => item['id'] === id) + 1;
