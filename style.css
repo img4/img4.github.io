@@ -17,12 +17,12 @@ a, a:hover, a:visited {
 
 /* top nav */
  .navbar {
-     height: 50px;
-     overflow:hidden;
-     padding: 0.2rem 0.2rem;
+     /*height: 40px;*/
+     /*overflow:hidden;*/
+     /*padding: 0 5px;*/
      /*background-color: rgb(55, 55, 55); !* Slightly lighter than rgb(14, 14, 14) *!*/
      border-bottom: 1px solid #333;
-     z-index:-999;
+     /*z-index:-999;*/
 }
 
 .navbar-brand {
@@ -31,10 +31,10 @@ a, a:hover, a:visited {
     font-size: 0.9rem;
     color: #6c757d;
 }
-.nav-sides-wrap {
-    width: 200px;
-    color: #6c757d;
-}
+/*.nav-sides-wrap {*/
+/*    width: 200px;*/
+/*    color: #6c757d;*/
+/*}*/
 
 /* jQuery UI Autocomplete dropdown styles */
 .ui-autocomplete {

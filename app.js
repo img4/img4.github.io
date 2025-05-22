@@ -40,11 +40,17 @@ $(() => {
 			},
 			close: ()=>{
 				$('#search-input').val('')
-				console.log('arf')
 			},
 			open: function(event, ui) {
 				// console.log('Dropdown opened with items:', $(this).autocomplete('widget').find('.ui-menu-item').length);
-			}
+			},
+			// _renderItem: function( ul, item ) {
+			// 	var term = this.term;
+			// 	var text = item.label.replace(new RegExp(term, "gi"), "<b>$&</b>");
+			// 	return $( "<li>" )
+			// 		.append( "<div>" + text + "</div>" )
+			// 		.appendTo( ul );
+			// }
 		});
 
 		// get lastIndex and poll regularly
