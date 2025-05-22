@@ -74,8 +74,9 @@ $(() => {
 				if (e.key === 'ArrowLeft') {
 					if (document.activeElement.id === 'search-input' && document.activeElement.value !== '') return
 					clearInterval(arInterval)
-					id = (parseInt(id, 36) - 1).toString(36)
-					if (id < 1) id = 1
+					intId = (parseInt(id, 36) - 1).toString(36)
+					if (intId < 1) return
+					id = intId
 					history.replaceState(null, null, location.origin + location.pathname + '?' + id)
 					initSingle(id)
 				} else if (e.key === 'ArrowRight') {
@@ -296,7 +297,6 @@ async function getImageData(id) {
 
 // update paging in the header (single view)
 // use searchData to only count valid pages
-// TODO use searchData for all next/prev operations so nothing breaks when items dont exist
 function singlePagingInit(id) {
 	// << < 12 of 123 > >>
 	// let nItems = searchData.length
@@ -310,30 +310,15 @@ function singlePagingInit(id) {
 
 // TODO use searchData for all next/prev operations so nothing breaks when items dont exist
 function singlePagingPrev() {
-	// clearInterval(arInterval)
-	// let newId = (parseInt(id, 36) - 1).toString(36)
-	// if (newId < 1) return
-	// if (searchData.findIndex(item => item['id'] === newId) === -1) return false
-	// id = newId
-	// history.replaceState(null, null, location.origin + location.pathname + '?' + id)
-	// initSingle(id)
 	clearInterval(arInterval)
-	id = (parseInt(id, 36) - 1).toString(36)
-	if (id < 1) id = 1
+	intId = (parseInt(id, 36) - 1).toString(36)
+	if (intId < 1) return
+	id = intId
 	history.replaceState(null, null, location.origin + location.pathname + '?' + id)
 	initSingle(id)
 }
 
-// TODO use searchData for all next/prev operations so nothing breaks when items dont exist
 function singlePagingNext() {
-	// let intId = parseInt(id, 36)
-	// if (intId >= lastIndex) return
-	// clearInterval(arInterval)
-	// let newId = (intId + 1).toString(36)
-	// if (searchData.findIndex(item => item['id'] === newId) === -1) return false
-	// id = newId
-	// history.replaceState(null, null, location.origin + location.pathname + '?' + id)
-	// initSingle(id)
 	let intId = parseInt(id, 36)
 	if (intId >= lastIndex) return
 	clearInterval(arInterval)
