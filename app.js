@@ -37,7 +37,9 @@ $(() => {
 			minLength: 1,
 			select: function (event, ui) {
 				// console.log('Selected item ID:', ui.item.id);
-				initSingle(ui.item.id)
+				id = ui.item.id
+				history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+				initSingle(id)
 				setTimeout(() => {
 					$('#search-input').val('')
 				}, 0)
