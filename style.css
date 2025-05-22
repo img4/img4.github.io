@@ -31,10 +31,16 @@ a, a:hover, a:visited {
     font-size: 0.9rem;
     color: #6c757d;
 }
-/*.nav-sides-wrap {*/
-/*    width: 200px;*/
-/*    color: #6c757d;*/
-/*}*/
+.nav-sides-wrap {
+    width: 200px;
+    color: #6c757d;
+}
+#nav-middle {
+    white-space: nowrap;
+}
+#nav-middle .clickable {
+    cursor:pointer;
+}
 
 /* jQuery UI Autocomplete dropdown styles */
 .ui-autocomplete {

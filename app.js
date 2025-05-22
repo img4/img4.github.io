@@ -41,7 +41,7 @@ $(() => {
 				setTimeout(() => {
 					$('#search-input').val('')
 				}, 0)
-				return false
+				return false // dont set long value
 			},
 			close: () => {
 				// $('#search-input').val('')
@@ -49,13 +49,6 @@ $(() => {
 			open: function (event, ui) {
 				// console.log('Dropdown opened with items:', $(this).autocomplete('widget').find('.ui-menu-item').length);
 			},
-			// _renderItem: function( ul, item ) {
-			// 	var term = this.term;
-			// 	var text = item.label.replace(new RegExp(term, "gi"), "<b>$&</b>");
-			// 	return $( "<li>" )
-			// 		.append( "<div>" + text + "</div>" )
-			// 		.appendTo( ul );
-			// }
 		});
 
 		// get lastIndex and poll regularly
@@ -75,6 +68,7 @@ $(() => {
 		// on load, view one image or gallery
 		if (id) { // one image
 			console.log('init single image')
+			singlePagingInit(id)
 			// bind left and right keys to increase or decrease id
 			document.addEventListener('keydown', (e) => {
 				if (e.key === 'ArrowLeft') {
@@ -107,6 +101,7 @@ $(() => {
 
 // store highest image id so know where to browse, e.g. with arrow keys or paging or next buttons, and where to start gallery
 // value obtained by parsing commit messages for e.g. 'Result 123'. unauthed rate limit 60/h
+// TODO: add empty item to searchData if it doesn't contain data for the latest index(es), as it may update slower than lastIndex, for use in paging. also update paging when it changes
 async function getLastIndex(poll) {
 	return new Promise(re => {
 		let li = localStorage.getItem('lastIndex')
@@ -198,6 +193,8 @@ function initSingle(id) {
 		console.log('initSingle(' + id + ')')
 		let r, arStartTime, arWrap, refreshBtn
 		r = await getImageData(id)
+		// $('#nav-page-curitem').html(searchData.findIndex(item => item['id'] === id) + 1);
+		$('#nav-page-curitem').html(parseInt(id, 36));
 		if (r) {
 			// if found image has id greater than lastIndex, update lastIndex. this provides functionality before the regular polling that will soon find it
 			let intId = parseInt(id, 36)
@@ -292,6 +289,55 @@ async function getImageData(id) {
 				re(false)
 			})
 	})
+}
+
+
+// update paging in the header (single view)
+// use searchData to only count valid pages
+// TODO use searchData for all next/prev operations so nothing breaks when items dont exist
+function singlePagingInit(id) {
+	// << < 12 of 123 > >>
+	// let nItems = searchData.length
+	// let i = searchData.findIndex(item => item['id'] === id) + 1;
+	let nItems = lastIndex
+	let i =  parseInt(id,36)
+	$('#nav-middle').html('<ul class="pagination pagination-sm m-0"><li class="page-item"><a id="page-single-prev" class="page-link clickable">«</a></li><li class="page-item"><a class="page-link" style="color:#c0c0c0; pointer-events: none;"><span id="nav-page-curitem">' + i + '</span> of <span id="nav-page-nitems">' + nItems + '</span></a></li><li class="page-item"><a id="page-single-next" class="page-link clickable">»</a></li></ul>')
+	$('#page-single-prev').click(singlePagingPrev)
+	$('#page-single-next').click(singlePagingNext)
+}
+
+// TODO use searchData for all next/prev operations so nothing breaks when items dont exist
+function singlePagingPrev() {
+	// clearInterval(arInterval)
+	// let newId = (parseInt(id, 36) - 1).toString(36)
+	// if (newId < 1) return
+	// if (searchData.findIndex(item => item['id'] === newId) === -1) return false
+	// id = newId
+	// history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+	// initSingle(id)
+	clearInterval(arInterval)
+	id = (parseInt(id, 36) - 1).toString(36)
+	if (id < 1) id = 1
+	history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+	initSingle(id)
+}
+
+// TODO use searchData for all next/prev operations so nothing breaks when items dont exist
+function singlePagingNext() {
+	// let intId = parseInt(id, 36)
+	// if (intId >= lastIndex) return
+	// clearInterval(arInterval)
+	// let newId = (intId + 1).toString(36)
+	// if (searchData.findIndex(item => item['id'] === newId) === -1) return false
+	// id = newId
+	// history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+	// initSingle(id)
+	let intId = parseInt(id, 36)
+	if (intId >= lastIndex) return
+	clearInterval(arInterval)
+	id = (intId + 1).toString(36)
+	history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+	initSingle(id)
 }
 
 // proper base64 decode https://tinyurl.com/atob5
