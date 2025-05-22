@@ -20,8 +20,9 @@ $(() => {
 				strWords.some(sWord => sWord.includes(qWord))
 			);
 		}
+
 		$('#search-input').autocomplete({
-			source: function(request, response) {
+			source: function (request, response) {
 				const term = request.term.toLowerCase();
 				const matches = searchData
 					.filter(item => item.p.toLowerCase().includes(term) || fuzzyMatch(item.p, term))
@@ -34,14 +35,18 @@ $(() => {
 				response(matches);
 			},
 			minLength: 1,
-			select: function(event, ui) {
+			select: function (event, ui) {
 				// console.log('Selected item ID:', ui.item.id);
 				initSingle(ui.item.id)
+				setTimeout(() => {
+					$('#search-input').val('')
+				}, 0)
+				return false
 			},
-			close: ()=>{
-				$('#search-input').val('')
+			close: () => {
+				// $('#search-input').val('')
 			},
-			open: function(event, ui) {
+			open: function (event, ui) {
 				// console.log('Dropdown opened with items:', $(this).autocomplete('widget').find('.ui-menu-item').length);
 			},
 			// _renderItem: function( ul, item ) {
@@ -73,6 +78,7 @@ $(() => {
 			// bind left and right keys to increase or decrease id
 			document.addEventListener('keydown', (e) => {
 				if (e.key === 'ArrowLeft') {
+					if (document.activeElement.id === 'search-input' && document.activeElement.value !== '') return
 					clearInterval(arInterval)
 					id = (parseInt(id, 36) - 1).toString(36)
 					if (id < 1) id = 1
@@ -80,6 +86,7 @@ $(() => {
 					initSingle(id)
 				} else if (e.key === 'ArrowRight') {
 					(async () => {
+						if (document.activeElement.id === 'search-input' && document.activeElement.value !== '') return
 						let intId = parseInt(id, 36)
 						console.log('ArrowRight intId:', intId, 'lastIndex:', lastIndex, intId >= lastIndex ? 'aborting' : '')
 						if (intId >= lastIndex) return
