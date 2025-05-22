@@ -58,6 +58,7 @@ a, a:hover, a:visited {
 }
 .ui-menu-item {
     /*padding: 8px;*/
+    padding:0;
     cursor: pointer;
 }
 .ui-menu-item:hover {

@@ -118,6 +118,7 @@ async function getLastIndex(poll) {
 						console.log((poll ? '[poll] ' : '') + 'getLastIndex() refreshed =', li)
 						localStorage.setItem('lastIndex', li)
 						localStorage.setItem('lastIndexTime', Date.now().toString())
+						$('#nav-page-nitems').html = li;
 						return re(parseInt(li))
 					}
 				}
@@ -203,6 +204,7 @@ function initSingle(id) {
 				lastIndex = intId
 				localStorage.setItem('lastIndex', lastIndex.toString())
 				localStorage.setItem('lastIndexTime', Date.now().toString())
+				$('#nav-page-nitems').html = lastIndex;
 			}
 			showSingle(r)
 		} else {
@@ -300,7 +302,7 @@ function singlePagingInit(id) {
 	// let nItems = searchData.length
 	// let i = searchData.findIndex(item => item['id'] === id) + 1;
 	let nItems = lastIndex
-	let i =  parseInt(id,36)
+	let i = parseInt(id, 36)
 	$('#nav-middle').html('<ul class="pagination pagination-sm m-0"><li class="page-item"><a id="page-single-prev" class="page-link clickable">«</a></li><li class="page-item"><a class="page-link" style="color:#c0c0c0; pointer-events: none;"><span id="nav-page-curitem">' + i + '</span> of <span id="nav-page-nitems">' + nItems + '</span></a></li><li class="page-item"><a id="page-single-next" class="page-link clickable">»</a></li></ul>')
 	$('#page-single-prev').click(singlePagingPrev)
 	$('#page-single-next').click(singlePagingNext)
