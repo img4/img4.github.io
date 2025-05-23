@@ -4,85 +4,11 @@ let lastIndex, searchData, arInterval
 
 $(() => {
 	(async () => {
-		searchData = await getSearchData()
-		setInterval(() => {
-			(async () => {
-				searchData = await getSearchData(true)
-			})()
-		}, 120000)
+		await initLastIndex()
+		await initSearch()
 
-		// activate search box
-		function fuzzyMatch(str, query) {
-			const strWords = str.toLowerCase().split(/\s+/);
-			const queryWords = query.toLowerCase().trim().split(/\s+/);
-			// Every query word must be a substring of some word in str
-			return queryWords.every(qWord =>
-				strWords.some(sWord => sWord.includes(qWord))
-			);
-		}
-
-		$('#search-input').autocomplete({
-			source: function (request, response) {
-				const term = request.term.toLowerCase();
-				const matches = searchData
-					.filter(item => item.p.toLowerCase().includes(term) || fuzzyMatch(item.p, term))
-					.map(item => ({
-						label: item.p,
-						value: item.p,
-						id: item.id
-					}));
-				// console.log('Search query:', term, 'Matches:', matches);
-				response(matches);
-			},
-			minLength: 1,
-			select: function (event, ui) {
-				// console.log('Selected item ID:', ui.item.id);
-				id = ui.item.id
-				history.replaceState(null, null, location.origin + location.pathname + '?' + id)
-				initSingle(id)
-				// setTimeout(() => {
-				// 	$('#search-input').val('')
-				// }, 0)
-				if($('#nav-middle').html()==="") singlePagingInit()
-				$('#search-input').blur()
-				return false // dont set long value
-			},
-			open: function (event, ui) {
-				// console.log('Dropdown opened with items:', $(this).autocomplete('widget').find('.ui-menu-item').length);
-			},
-			close: function(){
-				$('#search-input').blur()
-				closing = false;
-			}
-		})
-		.focus(function(){
-			if ((!closing) && ($(this).val() !== "")){
-				$(this).autocomplete("search");
-			}
-		})
-		.hover(function() {
-			$('#search-input').focus()
-		})
-		$('#search-clear-btn').click(()=>{
-			$('#search-input').val('')
-		})
-
-		// get lastIndex and poll regularly
-		// TODO pause polling when not focused
-		lastIndex = await getLastIndex()
-		setInterval(() => {
-			(async () => {
-				let oldIndex = lastIndex
-				lastIndex = await getLastIndex(true)
-				// TODO when it increases, toast that there are new images
-				if (lastIndex > oldIndex) {
-					console.log('[poll] lastIndex > oldIndex = new images')
-				}
-			})()
-		}, 15000)
-
-		// on load, view one image or gallery
-		if (id) { // one image
+		// one image
+		if (id) {
 			console.log('init single image')
 			singlePagingInit()
 			// bind left and right keys to increase or decrease id
@@ -102,6 +28,87 @@ $(() => {
 		}
 	})()
 })
+
+async function initLastIndex() {
+	// get lastIndex and poll regularly
+	lastIndex = await getLastIndex()
+	// TODO pause polling when not focused
+	setInterval(() => {
+		(async () => {
+			let oldIndex = lastIndex
+			lastIndex = await getLastIndex(true)
+			// TODO when it increases, toast that there are new images
+			if (lastIndex > oldIndex) {
+				console.log('[poll] lastIndex > oldIndex = new images')
+			}
+		})()
+	}, 15000)
+}
+
+async function initSearch() {
+	searchData = await getSearchData()
+	setInterval(() => {
+		(async () => {
+			searchData = await getSearchData(true)
+		})()
+	}, 120000)
+
+	// activate search box
+	function fuzzyMatch(str, query) {
+		const strWords = str.toLowerCase().split(/\s+/);
+		const queryWords = query.toLowerCase().trim().split(/\s+/);
+		// Every query word must be a substring of some word in str
+		return queryWords.every(qWord =>
+			strWords.some(sWord => sWord.includes(qWord))
+		);
+	}
+
+	$('#search-input').autocomplete({
+		source: function (request, response) {
+			const term = request.term.toLowerCase();
+			const matches = searchData
+				.filter(item => item.p.toLowerCase().includes(term) || fuzzyMatch(item.p, term))
+				.map(item => ({
+					label: item.p,
+					value: item.p,
+					id: item.id
+				}));
+			// console.log('Search query:', term, 'Matches:', matches);
+			response(matches);
+		},
+		minLength: 1,
+		select: function (event, ui) {
+			// console.log('Selected item ID:', ui.item.id);
+			id = ui.item.id
+			history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+			initSingle(id)
+			// setTimeout(() => {
+			// 	$('#search-input').val('')
+			// }, 0)
+			if ($('#nav-middle').html() === "") singlePagingInit()
+			$('#search-input').blur()
+			return false // dont set long value
+		},
+		open: function (event, ui) {
+			// console.log('Dropdown opened with items:', $(this).autocomplete('widget').find('.ui-menu-item').length);
+		},
+		close: function () {
+			$('#search-input').blur()
+			closing = false;
+		}
+	})
+		.focus(function () {
+			if ((!closing) && ($(this).val() !== "")) {
+				$(this).autocomplete("search");
+			}
+		})
+		.hover(function () {
+			$('#search-input').focus()
+		})
+	$('#search-clear-btn').click(() => {
+		$('#search-input').val('')
+	})
+}
 
 // store highest image id so know where to browse, e.g. with arrow keys or paging or next buttons, and where to start gallery
 // value obtained by parsing commit messages for e.g. 'Result 123'. unauthed rate limit 60/h
