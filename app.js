@@ -40,19 +40,29 @@ $(() => {
 				id = ui.item.id
 				history.replaceState(null, null, location.origin + location.pathname + '?' + id)
 				initSingle(id)
-				setTimeout(() => {
-					$('#search-input').val('')
-				}, 0)
+				// setTimeout(() => {
+				// 	$('#search-input').val('')
+				// }, 0)
 				if($('#nav-middle').html()==="") singlePagingInit()
+				$('#search-input').blur()
 				return false // dont set long value
-			},
-			close: () => {
-				// $('#search-input').val('')
 			},
 			open: function (event, ui) {
 				// console.log('Dropdown opened with items:', $(this).autocomplete('widget').find('.ui-menu-item').length);
 			},
-		});
+			close: function(){
+				$('#search-input').blur()
+				closing = false;
+			}
+		})
+		.focus(function(){
+			if ((!closing) && ($(this).val() !== "")){
+				$(this).autocomplete("search");
+			}
+		})
+		.hover(function() {
+			$('#search-input').focus()
+		})
 
 		// get lastIndex and poll regularly
 		// TODO pause polling when not focused

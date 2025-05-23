@@ -67,7 +67,7 @@ a, a:hover, a:visited {
     border-radius: 4px;
     max-height: calc(100vh - 50px);
     overflow-y: auto;
-    overflow-x: hidden;  /* Hide horizontal overflow */
+    /*overflow-x: hidden;  !* Hide horizontal overflow *!*/
     /*width: 100%;*/
     max-width: 80%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
