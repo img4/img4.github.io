@@ -1,6 +1,6 @@
 let userRepo = location.pathname.indexOf("/d/code") !== -1 ? 'img4/i' /* local dev */ : location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
 let id = (location.search ? location.search.substring(1) : '').split('&')[0]
-let lastIndex, searchData, arInterval, closing
+let lastIndex, searchData, arInterval
 
 $(() => {
 	(async () => {
@@ -94,16 +94,13 @@ async function initSearch() {
 		},
 		close: function () {
 			$('#search-input').blur()
-			closing = false;
 		}
 	})
 		.focus(function () {
-			if ((!closing) && ($(this).val() !== "")) {
-				$(this).autocomplete("search");
-			}
+			if (this.value !== '') $(this).autocomplete('search')
 		})
 		.hover(function () {
-			$('#search-input').focus()
+			this.focus()
 		})
 	$('#search-clear-btn').click(() => {
 		$('#search-input').val('')
