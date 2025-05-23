@@ -112,6 +112,7 @@ async function getLastIndex(poll) {
 		let lit = localStorage.getItem('lastIndexTime')
 		if (li && Date.now() - parseInt(lit) <= 60000) {
 			console.log((poll ? '[poll] ' : '') + 'getLastIndex() cached =', li)
+			$('#nav-page-nitems').html(li)
 			return re(parseInt(li))
 		}
 		$.get('https://api.github.com/repos/' + userRepo + '/commits?per_page=5', 'json')
