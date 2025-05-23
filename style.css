@@ -17,6 +17,10 @@ a, a:hover, a:visited {
 
 /* top nav */
  .navbar {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     width: 100%;
      /*height: 40px;*/
      /*overflow:hidden;*/
      /*padding: 0 5px;*/
@@ -25,22 +29,33 @@ a, a:hover, a:visited {
      /*z-index:-999;*/
 }
 
-.navbar-brand {
-}
-.nav-tip {
-    font-size: 0.9rem;
-    /*color: #c0c0c0;*/
+.nav-left, .nav-right {
+    flex: 1; /* Equal width for sides, adjusts to content */
+    /* Optional: add min/max widths if needed */
+    /* min-width: 100px; */
     color: #6c757d;
 }
-.nav-sides-wrap {
-    width: 200px;
-    color: #6c757d;
+
+.nav-left {
+    text-align: left;
 }
+
+.nav-right {
+    text-align: right;
+    font-size:0.9rem;
+}
+
 #nav-middle {
-    white-space: nowrap;
+    flex: 0 1 auto; /* Won't grow, will shrink, auto width */
+    text-align: center;
 }
+
 #nav-middle .clickable {
     cursor:pointer;
+}
+
+#search-input {
+    max-width:200px;
 }
 
 /* jQuery UI Autocomplete dropdown styles */
@@ -51,7 +66,7 @@ a, a:hover, a:visited {
     border-radius: 4px;
     /*max-height: 200px;*/
     /*overflow-y: auto;*/
-    /*width: 100%;*/
+    max-width: 80%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     /*position: absolute;*/
     /*top: 100%; !* Align below input *!*/
