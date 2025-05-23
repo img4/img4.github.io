@@ -66,6 +66,7 @@ $(() => {
 		$('#search-clear-btn').click(()=>{
 			$('#search-input').val('')
 		})
+
 		// get lastIndex and poll regularly
 		// TODO pause polling when not focused
 		lastIndex = await getLastIndex()
@@ -88,23 +89,10 @@ $(() => {
 			document.addEventListener('keydown', (e) => {
 				if (e.key === 'ArrowLeft') {
 					if (document.activeElement.id === 'search-input' && document.activeElement.value !== '') return
-					clearInterval(arInterval)
-					intId = (parseInt(id, 36) - 1).toString(36)
-					if (intId < 1) return
-					id = intId
-					history.replaceState(null, null, location.origin + location.pathname + '?' + id)
-					initSingle(id)
+					singlePagingPrev()
 				} else if (e.key === 'ArrowRight') {
-					(async () => {
-						if (document.activeElement.id === 'search-input' && document.activeElement.value !== '') return
-						let intId = parseInt(id, 36)
-						console.log('ArrowRight intId:', intId, 'lastIndex:', lastIndex, intId >= lastIndex ? 'aborting' : '')
-						if (intId >= lastIndex) return
-						clearInterval(arInterval)
-						id = (intId + 1).toString(36)
-						history.replaceState(null, null, location.origin + location.pathname + '?' + id)
-						initSingle(id)
-					})()
+					if (document.activeElement.id === 'search-input' && document.activeElement.value !== '') return
+					singlePagingNext()
 				}
 			});
 			initSingle(id)
