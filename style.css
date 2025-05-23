@@ -55,8 +55,36 @@ a, a:hover, a:visited {
     cursor: pointer;
 }
 
+#nav-input-wrap {
+    position:relative;
+    width: 200px;
+}
 #search-input {
-    max-width: 200px;
+    padding-right: 22px; /* Space for the X */
+}
+/*.clearable-input {*/
+/*    padding-right: 30px; !* Space for the X *!*/
+/*    padding: 5px;*/
+/*    font-size: 16px;*/
+/*}*/
+
+#search-clear-btn {
+    position: absolute;
+    right: 5px;
+    top: 45%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: inherit;
+    color: #999;
+    display: none; /* Hidden by default */
+}
+
+#search-clear-btn:hover {
+    color: #ccc;
+}
+
+#search-input:not(:placeholder-shown) + #search-clear-btn {
+    display: block; /* Show when input has text */
 }
 
 /* jQuery UI Autocomplete dropdown styles */

@@ -63,7 +63,9 @@ $(() => {
 		.hover(function() {
 			$('#search-input').focus()
 		})
-
+		$('#search-clear-btn').click(()=>{
+			$('#search-input').val('')
+		})
 		// get lastIndex and poll regularly
 		// TODO pause polling when not focused
 		lastIndex = await getLastIndex()
