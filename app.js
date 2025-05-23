@@ -136,13 +136,13 @@ async function getLastIndex(poll) {
 				}
 			})
 			.fail(e => {
-				console.log('getLastIndex() failed, e:', e)
+				console.error('getLastIndex() get failed, e:', e)
 				let li = localStorage.getItem('lastIndex')
 				if (li) {
-					console.log('getLastIndex() failed, returning cached =', li)
+					console.error('getLastIndex() get failed, returning cached =', li)
 					return re(parseInt(li))
 				} else {
-					console.log('getLastIndex() fatal error, no lastIndex in cache. returning null')
+					console.error('getLastIndex() fatal error, no lastIndex in cache. returning null')
 					return re(null)
 				}
 			})
@@ -162,38 +162,23 @@ async function getSearchData(poll) {
 		}
 		$.get('https://raw.githubusercontent.com/' + userRepo + '/HEAD/search.json.lz')
 			.done(sd => {
-				try {
-					localStorage.setItem('searchData', sd)
-					localStorage.setItem('searchDataTime', Date.now().toString())
-					sd = LZString.decompressFromBase64(sd);
-					sd = JSON.parse(sd);
-					console.log((poll ? '[poll] ' : '') + 'getSearchData() refreshed =', sd)
-					return re(sd)
-				} catch (e) {
-					// document.getElementById('output').innerText = "Decompressed data (not JSON): " + decompressed;
-					console.error("getSearchData() error:", e);
-					sd = localStorage.getItem('searchData')
-					if (sd) {
-						sd = LZString.decompressFromBase64(sd);
-						sd = JSON.parse(sd);
-						console.log('getSearchData() failed, returning cached =', sd)
-						return re(sd)
-					} else {
-						console.log('getSearchData() fatal error, no searchData in cache. returning null')
-						return re(null)
-					}
-				}
+				localStorage.setItem('searchData', sd)
+				localStorage.setItem('searchDataTime', Date.now().toString())
+				sd = LZString.decompressFromBase64(sd);
+				sd = JSON.parse(sd);
+				console.log((poll ? '[poll] ' : '') + 'getSearchData() refreshed =', sd)
+				return re(sd)
 			})
 			.fail(e => {
-				console.log('getSearchData() dl failed, e:', e)
+				console.error('getSearchData() get failed, e:', e)
 				let sd = localStorage.getItem('searchData')
 				if (sd) {
 					sd = LZString.decompressFromBase64(sd)
 					sd = JSON.parse(sd)
-					console.log('getSearchData() dl failed, returning cached =', sd)
+					console.error('getSearchData() get failed, returning cached =', sd)
 					return re(sd)
 				} else {
-					console.log('getSearchData() fatal error, no searchData in cache. returning null')
+					console.error('getSearchData() fatal error, no searchData in cache. returning null')
 					return re(null)
 				}
 			})
@@ -283,23 +268,19 @@ async function getImageData(id) {
 		$.get(url)
 			.done(r => {
 				if (!r) re(false)
-				try {
-					data = JSON.parse(r)
-					/*{ // service, model, prompt, type, image data, unix timestamp (secs)
-						"m": "imagen-3-generate-002",
-						"p": "funny picture of a shrew", (b64)
-						"i": "..." (data uri)
-						"t": 123456789
-					}*/
-					data.p = b64Decode(data.p)
-					console.log('getImageData() got image data:', data)
-					re(data)
-				} catch (e) {
-					console.log('getImageData() error: ' + e.message)
-				}
+				data = JSON.parse(r)
+				/*{ // service, model, prompt, type, image data, unix timestamp (secs)
+					"m": "imagen-3-generate-002",
+					"p": "funny picture of a shrew", (b64)
+					"i": "..." (data uri)
+					"t": 123456789
+				}*/
+				data.p = b64Decode(data.p)
+				console.log('getImageData() got image data:', data)
+				re(data)
 			})
-			.fail(() => {
-				console.log('getImageData() failed to get image data')
+			.fail(e => {
+				console.error('getImageData() failed to get image data. e:', e)
 				re(false)
 			})
 	})
