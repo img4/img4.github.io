@@ -1,6 +1,6 @@
 let userRepo = location.pathname.indexOf("/d/code") !== -1 ? 'img4/i' /* local dev */ : location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
 let id = (location.search ? location.search.substring(1) : '').split('&')[0]
-let lastIndex, searchData, arInterval
+let lastIndex, searchData, arInterval, closing
 
 $(() => {
 	(async () => {
