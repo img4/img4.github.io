@@ -245,17 +245,6 @@ function initSingle(id) {
 	})()
 }
 
-// show valid / found image
-function showSingle(r) {
-	console.log('showSingle()')
-	let svcId = r.m.split('-')[0], iconId
-	if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
-	$('link[rel="icon"]').remove()
-	$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
-	$('title').text(r.p)
-	$('#main').html('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
-}
-
 // get data from results hierarchy
 async function getImageData(id) {
 	return new Promise(re => {
@@ -283,9 +272,19 @@ async function getImageData(id) {
 	})
 }
 
+// show valid / found image
+function showSingle(r) {
+	console.log('showSingle()')
+	let svcId = r.m.split('-')[0], iconId
+	if (svcId === 'imagen' || svcId === 'gemini') iconId = 'gemini'; else if (svcId === 'grok') iconId = 'grok'; else if (svcId === 'gpt') iconId = 'gpt';
+	$('link[rel="icon"]').remove()
+	$('head').prepend('<link rel="icon" href="images/' + iconId + '-icon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)"/>\n<link rel="icon" href="images/' + iconId + '-icon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)"/>')
+	$('title').text(r.p)
+	$('#main').html('<div class="container"><h1 class="header">' + r.p + '</h1><div class="image-wrapper"><img src="' + r.i + '" alt=""><div class="footer">' + r.m + '</div></div></div>')
+}
 
 // update paging in the header (single view)
-// use searchData to only count valid pages
+// TODO use searchData to only count valid pages?
 function singlePagingInit() {
 	// << < 12 of 123 > >>
 	// let nItems = searchData.length
@@ -298,7 +297,7 @@ function singlePagingInit() {
 	// $('#nav-page-nitems').click(singlePagingLast)
 }
 
-// TODO use searchData for all next/prev operations so nothing breaks when items dont exist
+// TODO use searchData for all next/prev operations so nothing breaks when items dont exist?
 function singlePagingPrev() {
 	clearInterval(arInterval)
 	intId = (parseInt(id, 36) - 1).toString(36)
