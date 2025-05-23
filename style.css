@@ -62,11 +62,6 @@ a, a:hover, a:visited {
 #search-input {
     padding-right: 22px; /* Space for the X */
 }
-/*.clearable-input {*/
-/*    padding-right: 30px; !* Space for the X *!*/
-/*    padding: 5px;*/
-/*    font-size: 16px;*/
-/*}*/
 
 #search-clear-btn {
     position: absolute;
@@ -76,7 +71,7 @@ a, a:hover, a:visited {
     cursor: pointer;
     font-size: inherit;
     color: #999;
-    display: none; /* Hidden by default */
+    display: none;
 }
 
 #search-clear-btn:hover {
@@ -84,7 +79,7 @@ a, a:hover, a:visited {
 }
 
 #search-input:not(:placeholder-shown) + #search-clear-btn {
-    display: block; /* Show when input has text */
+    display: block;
 }
 
 /* jQuery UI Autocomplete dropdown styles */
@@ -96,26 +91,17 @@ a, a:hover, a:visited {
     max-height: calc(100vh - 50px);
     overflow-y: auto;
     /*overflow-x: hidden;  !* Hide horizontal overflow *!*/
-    /*width: 100%;*/
     max-width: 80%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    /*position: absolute;*/
-    /*top: 100%; !* Align below input *!*/
-    /*left: 0;*/
-    /*box-sizing: border-box;*/
 }
 
 .ui-menu-item {
-    padding: 1px;
+    padding: 1px; /* bug: scrollbar shows on hover if 0 */
     line-height:1.2em;
-    /*padding: 0;*/
-    /*margin: 0;*/
     cursor: pointer;
 }
 
 .ui-menu-item:hover {
-    /*padding: 0.1px;*/
-    /*margin: 0;*/
     background-color: #f8f9fa;
 }
 
