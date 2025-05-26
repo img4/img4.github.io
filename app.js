@@ -93,7 +93,7 @@ async function initSearch() {
 			// console.log('Dropdown opened with items:', $(this).autocomplete('widget').find('.ui-menu-item').length);
 		},
 		close: function () {
-			$('#search-input').blur()
+			// $('#search-input').blur()
 		}
 	})
 		.focus(function () {
@@ -150,28 +150,35 @@ async function getLastIndex(poll) {
 async function getSearchData(poll) {
 	return new Promise(re => {
 		let sd = localStorage.getItem('searchData')
-		let sdt = localStorage.getItem('searchDataTime')
-		if (sd && Date.now() - parseInt(sdt) <= 60000) {
+		if (sd) {
 			sd = LZString.decompressFromBase64(sd)
 			sd = JSON.parse(sd)
+		}
+		let sdt = localStorage.getItem('searchDataTime')
+		// let etag = localStorage.getItem('searchDataETag')
+		if (sd && Date.now() - parseInt(sdt) <= 60000) {
 			console.log((poll ? '[poll] ' : '') + 'getSearchData() cached =', sd)
 			return re(sd)
 		}
-		$.get('https://raw.githubusercontent.com/' + userRepo + '/HEAD/search.json.lz')
-			.done(sd => {
-				localStorage.setItem('searchData', sd)
-				localStorage.setItem('searchDataTime', Date.now().toString())
-				sd = LZString.decompressFromBase64(sd);
+		$.ajax('https://raw.githubusercontent.com/' + userRepo + '/HEAD/search.json.lz', {
+			// headers: {'If-None-Match': etag ? etag : ''}, // cant do it, CORS error on prefetch 403 https://github.com/orgs/community/discussions/24659
+		})
+			.done(r=>{//(r, status, xhr) => {
+				//if(status==='success') {
+				localStorage.setItem('searchData', r)
+				// localStorage.setItem('searchDataETag', xhr.getResponseHeader('ETag'))
+				sd = LZString.decompressFromBase64(r);
 				sd = JSON.parse(sd);
 				console.log((poll ? '[poll] ' : '') + 'getSearchData() refreshed =', sd)
+				/*} else if(status==='notmodified') {
+					console.log((poll ? '[poll] ' : '') + 'getSearchData() not modified =', sd)
+				}*/
+				localStorage.setItem('searchDataTime', Date.now().toString())
 				return re(sd)
 			})
 			.fail(e => {
 				console.error('getSearchData() get failed, e:', e)
-				let sd = localStorage.getItem('searchData')
 				if (sd) {
-					sd = LZString.decompressFromBase64(sd)
-					sd = JSON.parse(sd)
 					console.error('getSearchData() get failed, returning cached =', sd)
 					return re(sd)
 				} else {
