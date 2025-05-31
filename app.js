@@ -1,4 +1,5 @@
-let userRepo = location.pathname.indexOf("/d/code") !== -1 ? 'img4/i' /* local dev */ : location.host.split('.')[0] + '/' + location.pathname.split('/')[1]
+let user = location.pathname.indexOf("/d/code") !== -1 ? 'img4' /* local dev */ : location.host.split('.')[0]
+let userRepo = user + '/' + user + '.github.io'
 let id = (location.search ? location.search.substring(1) : '').split('&')[0]
 let lastIndex, searchData, arInterval
 
