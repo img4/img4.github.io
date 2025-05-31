@@ -2,9 +2,7 @@
 <html>
 <body>
 <script>
-	let id = (location.search ? location.search.substring(1) : '').split('&')[0]
-	let user = location.pathname.indexOf('/d/code') !== -1 ? 'img4' /* local dev */ : location.host.split('.')[0]
-	window.location.href = 'https://' + user + '.github.io?' + id
+	window.location.href = 'https://' + location.host.split('.')[0] + '.github.io?' + (location.search ? location.search.substring(1) : '').split('&')[0]
 </script>
 </body>
 </html>
