@@ -2,6 +2,7 @@
 <html>
 <body>
 <script>
+	// backwards-compatible redirect since we changed from using a repo subfolder to the root. new plugin installs don't need this folder or file
 	window.location.href = 'https://' + location.host.split('.')[0] + '.github.io?' + (location.search ? location.search.substring(1) : '').split('&')[0]
 </script>
 </body>
