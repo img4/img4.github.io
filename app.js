@@ -317,7 +317,7 @@ function singlePagingPrev() {
 
 function singlePagingNext() {
 	let intId = parseInt(id, 36)
-	if (intId >= lastIndex) return
+	// if (intId >= lastIndex) return
 	clearInterval(arInterval)
 	id = (intId + 1).toString(36)
 	history.replaceState(null, null, location.origin + location.pathname + '?' + id)
