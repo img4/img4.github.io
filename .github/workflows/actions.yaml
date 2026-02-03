@@ -1,0 +1,61 @@
+name: run build-search.py
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check commit message
+        id: check_message
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          if echo "$COMMIT_MESSAGE" | grep -qE '^Result [0-9]+$'; then
+            echo "matches=true" >> $GITHUB_OUTPUT
+          else
+            echo "matches=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Abort job
+        if: steps.check_message.outputs.matches == 'false'
+        run: echo "Aborting job because commit message does not match '^Result \d+$'"
+
+      - name: Setup python
+        if: steps.check_message.outputs.matches == 'true'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install python packages
+        if: steps.check_message.outputs.matches == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install base36
+          pip install lzstring
+
+      - name: Build search database
+        if: steps.check_message.outputs.matches == 'true'
+        run: python build-search.py
+
+      - name: Commit changes
+        if: steps.check_message.outputs.matches == 'true'
+        run: |
+          git config --global user.name "imgbot"
+          git config --global user.email "imgbot@example.com"
+          git add search.json.lz
+          git commit -m "Update search"
+          git push
