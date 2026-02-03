@@ -8,20 +8,21 @@ $(() => {
 		await initLastIndex()
 		await initSearch()
 
+		// bind left and right keys to increase or decrease id
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'ArrowLeft') {
+				if (document.activeElement.id === 'search-input' && document.activeElement.value !== '') return
+				if (id) singlePagingPrev()
+			} else if (e.key === 'ArrowRight') {
+				if (document.activeElement.id === 'search-input' && document.activeElement.value !== '') return
+				if (id) singlePagingNext()
+			}
+		});
+
 		// one image
 		if (id) {
 			console.log('init single image')
 			singlePagingInit()
-			// bind left and right keys to increase or decrease id
-			document.addEventListener('keydown', (e) => {
-				if (e.key === 'ArrowLeft') {
-					if (document.activeElement.id === 'search-input' && document.activeElement.value !== '') return
-					singlePagingPrev()
-				} else if (e.key === 'ArrowRight') {
-					if (document.activeElement.id === 'search-input' && document.activeElement.value !== '') return
-					singlePagingNext()
-				}
-			});
 			initSingle(id)
 		} else { // gallery
 			console.log('init gallery')
@@ -164,7 +165,7 @@ async function getSearchData(poll) {
 		$.ajax('https://raw.githubusercontent.com/' + userRepo + '/HEAD/search.json.lz', {
 			// headers: {'If-None-Match': etag ? etag : ''}, // cant do it, CORS error on prefetch 403 https://github.com/orgs/community/discussions/24659
 		})
-			.done(r=>{//(r, status, xhr) => {
+			.done(r => {//(r, status, xhr) => {
 				//if(status==='success') {
 				localStorage.setItem('searchData', r)
 				// localStorage.setItem('searchDataETag', xhr.getResponseHeader('ETag'))
@@ -300,8 +301,64 @@ function singlePagingInit() {
 	let nItems = lastIndex
 	let i = parseInt(id, 36)
 	$('#nav-middle').html('<ul class="pagination pagination-sm m-0"><li class="page-item"><a id="page-single-prev" class="page-link clickable">«</a></li><li class="page-item"><a class="page-link" style="color:#c0c0c0; pointer-events: none;"><span id="nav-page-curitem">' + i + '</span> of <span id="nav-page-nitems">' + nItems + '</span></a></li><li class="page-item"><a id="page-single-next" class="page-link clickable">»</a></li></ul>')
-	$('#page-single-prev').click(singlePagingPrev)
-	$('#page-single-next').click(singlePagingNext)
+	$('#page-single-prev').click(function(e) {
+		if (longPressTriggered) {
+			e.preventDefault()
+			e.stopPropagation()
+			longPressTriggered = false
+			return false
+		}
+		singlePagingPrev()
+	})
+	$('#page-single-next').click(function(e) {
+		if (longPressTriggered) {
+			e.preventDefault()
+			e.stopPropagation()
+			longPressTriggered = false
+			return false
+		}
+		singlePagingNext()
+	})
+
+	// Long-press functionality
+	let longPressTimer, longPressTriggered = false
+	$('#page-single-prev').on('mousedown touchstart', function (e) {
+		e.preventDefault()
+		longPressTriggered = false
+		longPressTimer = setTimeout(() => {
+			longPressTriggered = true
+			clearInterval(arInterval)
+			id = '1'
+			history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+			initSingle(id)
+		}, 2000)
+	}).on('mouseup mouseleave touchend', function (e) {
+		clearTimeout(longPressTimer)
+		if (longPressTriggered) {
+			e.preventDefault()
+			e.stopPropagation()
+			return false
+		}
+	})
+
+	$('#page-single-next').on('mousedown touchstart', function (e) {
+		e.preventDefault()
+		longPressTriggered = false
+		longPressTimer = setTimeout(() => {
+			longPressTriggered = true
+			clearInterval(arInterval)
+			id = lastIndex.toString(36)
+			history.replaceState(null, null, location.origin + location.pathname + '?' + id)
+			initSingle(id)
+		}, 2000)
+	}).on('mouseup mouseleave touchend', function (e) {
+		clearTimeout(longPressTimer)
+		if (longPressTriggered) {
+			e.preventDefault()
+			e.stopPropagation()
+			return false
+		}
+	})
 	// $('#nav-page-nitems').click(singlePagingLast)
 }
 
