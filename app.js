@@ -267,11 +267,12 @@ async function getImageData(id) {
 				/*{ // service, model, prompt, type, image data, unix timestamp (secs)
 					"m": "imagen-3-generate-002",
 					"p": "funny picture of a shrew", (b64)
+					"p2": "...", (optional enhanced prompt, b64)
 					"i": "..." (data uri)
 					"t": 123456789
 				}*/
 				data.p = b64Decode(data.p)
-				if(data.p2) data.p2 = b64Decode(data.p2) // optional enhanced prompt
+				if(data.p2) data.p2 = b64Decode(data.p2)
 				console.log('getImageData() got image data:', data)
 				re(data)
 			})
