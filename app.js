@@ -271,6 +271,7 @@ async function getImageData(id) {
 					"t": 123456789
 				}*/
 				data.p = b64Decode(data.p)
+				if(data.p2) data.p2 = b64Decode(data.p2) // optional enhanced prompt
 				console.log('getImageData() got image data:', data)
 				re(data)
 			})
