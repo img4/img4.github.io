@@ -10,7 +10,7 @@ $(async () => {
 	if (id) {
 		singlePagingInit();
 		initSingle(id);
-	} else {
+	} else if (!('ontouchstart' in window)) {
 		$('#search-input').focus();
 	}
 
