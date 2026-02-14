@@ -59,7 +59,11 @@ async function initSearch() {
             searchInput.blur(); 
             return false;
         }
-    });
+    }).autocomplete('instance')._renderItem = function(ul, item) {
+        const li = $('<li>').text(item.label);
+        if (item.id === id) li.css('background-color', '#d3d3d3');
+        return li.appendTo(ul);
+    };
 
     searchInput.on('mouseenter', function () {
         const val = $(this).val();
