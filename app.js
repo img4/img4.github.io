@@ -61,7 +61,7 @@ async function initSearch() {
                 const instance = searchInput.autocomplete('instance');
                 instance.menu.element.html('<li class="ui-menu-item"><div class="ui-menu-item-wrapper">Loading...</div></li>').show();
                 instance.menu.element.position({my: 'left top', at: 'left bottom', of: searchInput});
-            }, 100);
+            }, 500);
         },
         select: function (event, ui) {
             if (!ui.item.id) return false;
