@@ -88,7 +88,7 @@ async function initSearch() {
 		select: function (event, ui) {
 			if (!ui.item.id) return false;
 			id = ui.item.id;
-			history.replaceState(null, null, '?' + id);
+			history.pushState(null, null, '?' + id);
 			initSingle(id);
 			singlePagingInit();
 			searchInput.blur();
@@ -199,7 +199,7 @@ function singlePagingInit() {
 			longPressTimer = setTimeout(() => {
 				isLongPress = true;
 				id = '1';
-				history.replaceState(null, null, '?1');
+				history.pushState(null, null, '?1');
 				initSingle('1');
 			}, 2000);
 		})
@@ -209,7 +209,7 @@ function singlePagingInit() {
 			e.preventDefault(); // Stop ghost clicks and zoom delays
 		})
 		.on('mousedown', function () { // Desktop fallback
-			longPressTimer = setTimeout(() => { id = '1'; history.replaceState(null, null, '?1'); initSingle('1'); }, 2000);
+			longPressTimer = setTimeout(() => { id = '1'; history.pushState(null, null, '?1'); initSingle('1'); }, 2000);
 		})
 		.on('mouseup mouseleave', function () { clearTimeout(longPressTimer); })
 		.click(function (e) {
@@ -224,7 +224,7 @@ function singlePagingInit() {
 				if (lastIndex) {
 					isLongPress = true;
 					id = lastIndex.toString(36);
-					history.replaceState(null, null, '?' + id);
+					history.pushState(null, null, '?' + id);
 					initSingle(id);
 				}
 			}, 2000);
@@ -235,7 +235,7 @@ function singlePagingInit() {
 			e.preventDefault();
 		})
 		.on('mousedown', function () { // Desktop fallback
-			longPressTimer = setTimeout(() => { if (lastIndex) { id = lastIndex.toString(36); history.replaceState(null, null, '?' + id); initSingle(id); } }, 2000);
+			longPressTimer = setTimeout(() => { if (lastIndex) { id = lastIndex.toString(36); history.pushState(null, null, '?' + id); initSingle(id); } }, 2000);
 		})
 		.on('mouseup mouseleave', function () { clearTimeout(longPressTimer); })
 		.click(function (e) {
@@ -248,7 +248,7 @@ function singlePagingPrev() {
 	if (p >= 1) {
 		if ('ontouchstart' in window && document.activeElement) document.activeElement.blur();
 		id = p.toString(36);
-		history.replaceState(null, null, '?' + id);
+		history.pushState(null, null, '?' + id);
 		initSingle(id);
 	}
 }
@@ -258,7 +258,7 @@ function singlePagingNext() {
 	if (lastIndex && n > lastIndex) return;
 	if ('ontouchstart' in window && document.activeElement) document.activeElement.blur();
 	id = n.toString(36);
-	history.replaceState(null, null, '?' + id);
+	history.pushState(null, null, '?' + id);
 	initSingle(id);
 }
 
