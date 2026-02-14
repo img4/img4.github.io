@@ -61,7 +61,7 @@ async function initSearch() {
         }
     }).autocomplete('instance')._renderItem = function(ul, item) {
         const li = $('<li>').text(item.label);
-        if (item.id === id) li.css('background-color', '#d3d3d3');
+        if (item.id === id) li.css('background-color', '#e0e0e0');
         return li.appendTo(ul);
     };
 
