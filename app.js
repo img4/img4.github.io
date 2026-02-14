@@ -182,8 +182,20 @@ function singlePagingInit() {
             <li class="page-item"><a id="page-single-next" class="page-link clickable">»</a></li>
         </ul>`);
 
-    $('#page-single-prev').off().click(singlePagingPrev);
-    $('#page-single-next').off().click(singlePagingNext);
+    let longPressTimer;
+    $('#page-single-prev').off().click(singlePagingPrev)
+        .on('mousedown touchstart', (e) => {
+            e.preventDefault();
+            longPressTimer = setTimeout(() => { id = '1'; history.replaceState(null, null, '?1'); initSingle('1'); }, 2000);
+        })
+        .on('mouseup mouseleave touchend touchcancel', () => clearTimeout(longPressTimer));
+
+    $('#page-single-next').off().click(singlePagingNext)
+        .on('mousedown touchstart', (e) => {
+            e.preventDefault();
+            longPressTimer = setTimeout(() => { if (lastIndex) { id = lastIndex.toString(36); history.replaceState(null, null, '?' + id); initSingle(id); } }, 2000);
+        })
+        .on('mouseup mouseleave touchend touchcancel', () => clearTimeout(longPressTimer));
 }
 
 function singlePagingPrev() {
