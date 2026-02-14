@@ -36,7 +36,7 @@ $(async () => {
 		const diffY = touchStartY - touchEndY;
 
 		// Ensure horizontal swipe is dominant to avoid firing during vertical scrolls
-		if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY)) {
+		if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY)) {
 			if (diffX > 0) singlePagingNext();
 			else singlePagingPrev();
 		}
