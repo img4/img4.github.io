@@ -33,6 +33,7 @@ async function initSearch() {
         minLength: 1,
         source: async function (request, response) {
             if (!pagefind) return response([]);
+            let loadingTimer = setTimeout(() => response([{label: 'Loading...', value: '', id: null}]), 100);
             try {
                 const search = await pagefind.search(request.term);
                 const allResults = search.results;
@@ -44,14 +45,16 @@ async function initSearch() {
                     dataResults.push(...chunkData);
                 }
 
+                clearTimeout(loadingTimer);
                 response(dataResults.map(item => ({
                     label: item.meta.title,
                     value: item.meta.title,
                     id: item.url.replace('.html', '').split('/').pop()
                 })));
-            } catch (err) { response([]); }
+            } catch (err) { clearTimeout(loadingTimer); response([]); }
         },
         select: function (event, ui) {
+            if (!ui.item.id) return false;
             id = ui.item.id;
             history.replaceState(null, null, '?' + id);
             initSingle(id);
