@@ -10,6 +10,8 @@ $(async () => {
     if (id) {
         singlePagingInit();
         initSingle(id);
+    } else {
+        $('#search-input').focus();
     }
 
     document.addEventListener('keydown', (e) => {
@@ -28,6 +30,7 @@ async function initSearch() {
         return searchInput.attr('placeholder', 'Search unavailable').prop('disabled', true);
     }
 
+    let loadingTimer;
     searchInput.autocomplete({
         delay: 150,
         minLength: 1,
@@ -44,14 +47,22 @@ async function initSearch() {
                     dataResults.push(...chunkData);
                 }
 
+                clearTimeout(loadingTimer);
                 response(dataResults.map(item => ({
                     label: item.meta.title,
                     value: item.meta.title,
                     id: item.url.replace('.html', '').split('/').pop()
                 })));
-            } catch (err) { response([]); }
+            } catch (err) { clearTimeout(loadingTimer); response([]); }
+        },
+        search: function() {
+            clearTimeout(loadingTimer);
+            loadingTimer = setTimeout(() => {
+                searchInput.autocomplete('instance').menu.element.html('<li class="ui-menu-item"><div class="ui-menu-item-wrapper">Loading...</div></li>').show();
+            }, 100);
         },
         select: function (event, ui) {
+            if (!ui.item.id) return false;
             id = ui.item.id;
             history.replaceState(null, null, '?' + id);
             initSingle(id);
