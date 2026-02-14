@@ -33,7 +33,7 @@ async function initSearch() {
     let loadingTimer;
     searchInput.autocomplete({
         delay: 150,
-        minLength: 1,
+        minLength: 2,
         source: async function (request, response) {
             if (!pagefind) return response([]);
             try {
@@ -80,7 +80,7 @@ async function initSearch() {
 
     searchInput.on('mouseenter', function () {
         const val = $(this).val();
-        if (val.length >= 1) {
+        if (val.length >= 2) {
             $(this).autocomplete("search", val);
         }
     });
