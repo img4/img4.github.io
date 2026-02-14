@@ -105,6 +105,19 @@ a, a:hover, a:visited {
     background-color: rgb(140, 190, 255);
 }
 
+/* The loading spinner animation */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* This class will be added/removed by app.js */
+.is-loading {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 8 8A8 8 0 0 0 8 0zm0 14.5a6.5 6.5 0 1 1 6.5-6.5 6.5 6.5 0 0 1-6.5 6.5z'/%3E%3Cpath d='M8 1.5a6.5 6.5 0 0 1 6.5 6.5h1.5A8 8 0 0 0 8 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    animation: spin 1s linear infinite;
+}
+
 /* view single */
 #notfound {
     line-height: 28px;

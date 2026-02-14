@@ -31,13 +31,25 @@ async function initSearch() {
     searchInput.autocomplete({
         delay: 150,
         minLength: 1,
+        // Triggered when search starts
+        search: function() {
+            $(this).addClass('is-loading');
+        },
+        // Triggered when results are ready/menu opens
+        open: function() {
+            $(this).removeClass('is-loading');
+        },
+        // Triggered if menu closes or search fails
+        close: function() {
+            $(this).removeClass('is-loading');
+        },
         source: async function (request, response) {
             if (!pagefind) return response([]);
             try {
                 const search = await pagefind.search(request.term);
                 const allResults = search.results;
                 const dataResults = [];
-                const CHUNK_SIZE = 500;
+                const CHUNK_SIZE = 100;
 
                 for (let i = 0; i < allResults.length; i += CHUNK_SIZE) {
                     const chunkData = await Promise.all(allResults.slice(i, i + CHUNK_SIZE).map(r => r.data()));
@@ -49,7 +61,9 @@ async function initSearch() {
                     value: item.meta.title,
                     id: item.url.replace('.html', '').split('/').pop()
                 })));
-            } catch (err) { response([]); }
+            } catch (err) { 
+                response([]); 
+            }
         },
         select: function (event, ui) {
             id = ui.item.id;
@@ -59,17 +73,11 @@ async function initSearch() {
             searchInput.blur(); 
             return false;
         }
-    }).autocomplete('instance')._renderItem = function(ul, item) {
-        const li = $('<li>').text(item.label);
-        if (item.id === id) li.css('background-color', '#c8c8c8');
-        return li.appendTo(ul);
-    };
+    });
 
     searchInput.on('mouseenter', function () {
         const val = $(this).val();
-        if (val.length >= 1) {
-            $(this).autocomplete("search", val);
-        }
+        if (val.length >= 1) $(this).autocomplete("search", val);
     });
 
     $('#search-clear-btn').click(() => searchInput.val('').focus());
