@@ -246,7 +246,7 @@ function singlePagingInit() {
 function singlePagingPrev() {
 	let p = parseInt(id, 36) - 1;
 	if (p >= 1) {
-		if ('ontouchstart' in window) $('#search-input').blur();
+		if ('ontouchstart' in window && document.activeElement) document.activeElement.blur();
 		id = p.toString(36);
 		history.replaceState(null, null, '?' + id);
 		initSingle(id);
@@ -256,7 +256,7 @@ function singlePagingPrev() {
 function singlePagingNext() {
 	let n = parseInt(id, 36) + 1;
 	if (lastIndex && n > lastIndex) return;
-	if ('ontouchstart' in window) $('#search-input').blur();
+	if ('ontouchstart' in window && document.activeElement) document.activeElement.blur();
 	id = n.toString(36);
 	history.replaceState(null, null, '?' + id);
 	initSingle(id);
