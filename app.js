@@ -56,12 +56,12 @@ async function initSearch() {
 			history.replaceState(null, null, '?' + id);
 			initSingle(id);
 			singlePagingInit();
-			searchInput.blur();
+			searchInput.blur(); // dont set long value
 			return false;
 		}
 	});
 
-	// --- RESTORE HOVER FUNCTIONALITY ---
+	// on hover, show again
 	searchInput.on('mouseenter', function () {
 		const val = $(this).val();
 		if (val.length >= 1) {
