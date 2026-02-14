@@ -102,7 +102,7 @@ a, a:hover, a:visited {
 }
 
 .ui-menu-item:hover {
-    background-color: #f8f9fa;
+    background-color: rgb(110, 168, 254);
 }
 
 /* view single */
