@@ -10,6 +10,8 @@ $(async () => {
     if (id) {
         singlePagingInit();
         initSingle(id);
+    } else {
+        $('#search-input').focus();
     }
 
     document.addEventListener('keydown', (e) => {
