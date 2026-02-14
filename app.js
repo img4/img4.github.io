@@ -41,6 +41,14 @@ $(async () => {
 			else singlePagingPrev();
 		}
 	}, { passive: true });
+
+	window.addEventListener('popstate', () => {
+		id = (location.search ? location.search.substring(1) : '').split('&')[0];
+		if (id) {
+			initSingle(id);
+			singlePagingInit();
+		}
+	});
 });
 
 async function initSearch() {
@@ -250,6 +258,7 @@ function singlePagingPrev() {
 		id = p.toString(36);
 		history.pushState(null, null, '?' + id);
 		initSingle(id);
+		singlePagingInit();
 	}
 }
 
@@ -260,6 +269,7 @@ function singlePagingNext() {
 	id = n.toString(36);
 	history.pushState(null, null, '?' + id);
 	initSingle(id);
+	singlePagingInit();
 }
 
 function b64Decode(r) { return r ? new TextDecoder().decode(Uint8Array.from(atob(r), c => c.charCodeAt(0))) : ''; }
