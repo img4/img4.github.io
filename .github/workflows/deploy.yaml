@@ -1,0 +1,57 @@
+name: Build and Deploy Search Index
+
+on:
+  push:
+    branches:
+      - main
+
+# Automatically cancels older runs if you push multiple times quickly
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Setup Node to get the Pagefind Binary
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Pagefind Binary
+        run: npm install -g pagefind
+
+      # Setup Python for the build script
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Python dependencies
+        run: pip install base36 pagefind
+
+      - name: Build Shadow HTML
+        run: python -u build-search.py
+
+      - name: Run Pagefind Indexer
+        # --site is the folder to scan
+        # --output-path is where the index goes
+        # --index-attrs tells it to use the filename as the URL
+        run: npx pagefind --site temp_search_html --output-path s
+
+      # Deploy the generated ./s folder to the 'page' branch
+      - name: Deploy to Page Branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: page
+          publish_dir: ./s
+          destination_dir: s
+          keep_files: true
