@@ -37,7 +37,7 @@ async function initSearch() {
 				const search = await pagefind.search(request.term);
 				const allResults = search.results;
 				const dataResults = [];
-				const CHUNK_SIZE = 100;
+				const CHUNK_SIZE = 500;
 
 				for (let i = 0; i < allResults.length; i += CHUNK_SIZE) {
 					const chunkData = await Promise.all(allResults.slice(i, i + CHUNK_SIZE).map(r => r.data()));
