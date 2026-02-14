@@ -1,7 +1,7 @@
 let user = location.pathname.indexOf("/d/code") !== -1 ? 'img4' : location.host.split('.')[0];
 let userRepo = `${user}/${user}.github.io`;
 let id = (location.search ? location.search.substring(1) : '').split('&')[0];
-let lastIndex, pagefind, arInterval;
+let lastIndex, pagefind;
 
 $(async () => {
     await initSearch();
@@ -25,15 +25,23 @@ async function initSearch() {
     }
 
     searchInput.autocomplete({
-        delay: 150, // 150ms Debounce
+        delay: 150,
         minLength: 1,
         source: async function (request, response) {
             if (!pagefind) return response([]);
             try {
                 const search = await pagefind.search(request.term);
-                // No limit: Map all results to their data objects
-                const results = await Promise.all(search.results.map(r => r.data()));
-                response(results.map(item => ({
+                const allResults = search.results;
+                const dataResults = [];
+                const CHUNK_SIZE = 100; // Processing 100 at a time
+
+                for (let i = 0; i < allResults.length; i += CHUNK_SIZE) {
+                    const chunkData = await Promise.all(allResults.slice(i, i + CHUNK_SIZE).map(r => r.data()));
+                    dataResults.push(...chunkData);
+                    // NO BREAK: Processing every single match
+                }
+
+                response(dataResults.map(item => ({
                     label: item.meta.title,
                     value: item.meta.title,
                     id: item.url.replace('.html', '').split('/').pop()
@@ -49,7 +57,6 @@ async function initSearch() {
             return false;
         }
     });
-
     $('#search-clear-btn').click(() => searchInput.val('').focus());
 }
 
@@ -62,7 +69,6 @@ async function getLastIndex(poll) {
     return new Promise(re => {
         let li = localStorage.getItem('lastIndex'), lit = localStorage.getItem('lastIndexTime');
         if (!poll && li && Date.now() - parseInt(lit) <= 60000) return re(parseInt(li));
-
         $.get(`https://api.github.com/repos/${userRepo}/commits?per_page=5`, 'json').done(r => {
             for (let c of r) {
                 if (c.commit.message.match(/^Result /)) {
@@ -82,7 +88,7 @@ function initSingle(id) {
         let r = await getImageData(id);
         $('#nav-page-curitem').html(parseInt(id, 36));
         if (r) {
-            if (parseInt(id, 36) > lastIndex) $('#nav-page-nitems').html(parseInt(id, 36));
+            if (parseInt(id, 36) > (lastIndex || 0)) $('#nav-page-nitems').html(parseInt(id, 36));
             showSingle(r);
         }
     })();
