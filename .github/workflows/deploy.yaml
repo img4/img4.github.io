@@ -44,7 +44,7 @@ jobs:
         # --site is the folder to scan
         # --output-path is where the index goes
         # --index-attrs tells it to use the filename as the URL
-        run: npx pagefind --site temp_search_html --output-path s
+        run: npx pagefind@latest --site temp_search_html --output-path s --force-language en
 
       # Deploy the generated ./s folder to the 'page' branch
       - name: Deploy to Page Branch
@@ -54,4 +54,5 @@ jobs:
           publish_branch: page
           publish_dir: ./s
           destination_dir: s
-          keep_files: true
+          keep_files: false
+          full_commit_message: "Update search"
