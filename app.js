@@ -22,8 +22,7 @@ $(async () => {
 async function initSearch() {
     const searchInput = $('#search-input');
     try {
-        // Updated to use the new bundle name "search"
-        pagefind = await import("/s/search.js");
+        pagefind = await import("/s/pagefind.js");
         await pagefind.init();
     } catch (e) {
         return searchInput.attr('placeholder', 'Search unavailable').prop('disabled', true);
