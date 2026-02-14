@@ -56,7 +56,7 @@ async function initSearch() {
 			history.replaceState(null, null, '?' + id);
 			initSingle(id);
 			singlePagingInit();
-			searchInput.val(ui.item.label).blur();
+			searchInput.blur();
 			return false;
 		}
 	});
