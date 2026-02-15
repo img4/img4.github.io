@@ -18,11 +18,15 @@ def process_files():
     print(f"--- Step 1: Generating Shadow HTML ---", flush=True)
     
     count = 0
+    max_id = 0
     # Faster walker
     for root, dirs, files in os.walk(images_root):
         for file in files:
             try:
                 base36_name = file.lower()
+                high_id = base36.loads(base36_name)
+                max_id = max(max_id, high_id)
+                
                 with open(os.path.join(root, file), "r") as f:
                     data = json.load(f)
                     p_value = data.get("p")
@@ -40,6 +44,10 @@ def process_files():
                 continue
     
     print(f"Generated {count} shadow files in {round(time.time() - start_time, 2)}s", flush=True)
+    
+    # Generate high_id with highest ID
+    with open("high_id", "w") as f:
+        f.write(str(max_id))
 
 if __name__ == "__main__":
     process_files()
