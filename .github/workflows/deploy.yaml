@@ -57,14 +57,16 @@ jobs:
           keep_files: false
           full_commit_message: "Update search"
 
-      # Deploy high_id file separately to overwrite only itself
+      # Deploy only high_id file to page branch root
+      - name: Create temp dir for high_id
+        run: mkdir high_id_deploy && cp high_id high_id_deploy/
+
       - name: Deploy high_id to Page Branch
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: page
-          publish_dir: .
+          publish_dir: ./high_id_deploy
           destination_dir: .
           keep_files: true
-          allow_empty_commit: false
           full_commit_message: "Update high_id"
