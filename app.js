@@ -147,13 +147,60 @@ async function getLastIndex(poll) {
 function initSingle(id) {
 	(async () => {
 		let r = await getImageData(id);
-		const currentInt = parseInt(id, 36);
-		$('#nav-page-curitem').html(currentInt);
-		if (lastIndex && currentInt > lastIndex) {
-			lastIndex = currentInt;
-			$('#nav-page-nitems').html(lastIndex);
+		const intId = parseInt(id, 36);
+		$('#nav-page-curitem').html(intId);
+		if (r) {
+			// if found image has id greater than lastIndex, update lastIndex
+			if (intId > lastIndex) {
+				console.log('found id ' + intId + ' > lastIndex ' + lastIndex + ', updating');
+				lastIndex = intId;
+				localStorage.setItem('lastIndex', lastIndex.toString());
+				localStorage.setItem('lastIndexTime', Date.now().toString());
+				$('#nav-page-nitems').html(lastIndex);
+			}
+			showSingle(r);
+		} else {
+			$('link[rel="icon"]').remove();
+			$('title').text('Not found');
+			console.log('image not found. start auto-refresh (id=' + id + ')');
+			$('#main').html('<div id="notfound"><b>Image ' + id + ' not found</b><br>New images can take a few seconds to propagate<br><div id="auto-refresh-wrap">Auto-refreshing every 3s for 5m...<br><div class="spinner-border text-primary" role="status" style="margin-top:5px"><span class="visually-hidden">Loading...</span></div></div><a id="refresh-btn" class="btn btn-primary" style="display:none; margin-top:5px">Refresh</a><br></div>');
+			let arWrap = $('#auto-refresh-wrap');
+			let refreshBtn = $('#refresh-btn');
+			let arStartTime, arInterval;
+
+			let checkIt = function () {
+				(async () => {
+					console.log('checkIt(' + id + ')');
+					if (Date.now() - arStartTime > 300000) {
+						console.log('auto-refresh timeout, showing restart button');
+						clearInterval(arInterval);
+						arWrap.hide();
+						refreshBtn.show();
+					}
+					r = await getImageData(id);
+					if (r) {
+						clearInterval(arInterval);
+						showSingle(r);
+					}
+				})();
+			};
+
+			function autoRefreshStart(first) {
+				console.log('autoRefreshStart(' + id + ')');
+				refreshBtn.hide();
+				arWrap.show();
+				arStartTime = Date.now();
+				if (arInterval) clearInterval(arInterval);
+				arInterval = setInterval(checkIt, 3000);
+				if (!first) checkIt();
+			}
+
+			autoRefreshStart(true);
+
+			refreshBtn.click(function () {
+				autoRefreshStart();
+			});
 		}
-		if (r) showSingle(r);
 	})();
 }
 
@@ -256,7 +303,6 @@ function singlePagingPrev() {
 
 function singlePagingNext() {
 	let n = parseInt(id, 36) + 1;
-	if (lastIndex && n > lastIndex) return;
 	if ('ontouchstart' in window && document.activeElement) document.activeElement.blur();
 	id = n.toString(36);
 	history.replaceState(null, null, '?' + id);
