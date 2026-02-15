@@ -136,8 +136,15 @@ async function getLastIndex(poll) {
 				localStorage.setItem('lastIndexTime', Date.now().toString());
 				$('#nav-page-nitems').html(val);
 				re(val);
-			} else re(cur);
-		}).fail(() => re(li ? parseInt(li) : 0));
+			} else {
+				$('#nav-page-nitems').html(cur);
+				re(cur);
+			}
+		}).fail(() => {
+			let val = li ? parseInt(li) : 0;
+			$('#nav-page-nitems').html(val);
+			re(val);
+		});
 	});
 }
 
