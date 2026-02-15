@@ -129,11 +129,14 @@ async function getLastIndex(poll) {
 			return re(parseInt(li));
 		}
 		$.get('/high_id').done(r => {
-			let val = r.trim();
-			localStorage.setItem('lastIndex', val);
-			localStorage.setItem('lastIndexTime', Date.now().toString());
-			$('#nav-page-nitems').html(val);
-			re(parseInt(val));
+			let val = parseInt(r.trim());
+			let cur = localStorage.getItem('lastIndex') ? parseInt(localStorage.getItem('lastIndex')) : 0;
+			if (val > cur) {
+				localStorage.setItem('lastIndex', val);
+				localStorage.setItem('lastIndexTime', Date.now().toString());
+				$('#nav-page-nitems').html(val);
+				re(val);
+			} else re(cur);
 		}).fail(() => re(li ? parseInt(li) : 0));
 	});
 }
