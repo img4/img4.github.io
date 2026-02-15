@@ -128,18 +128,12 @@ async function getLastIndex(poll) {
 			$('#nav-page-nitems').html(li);
 			return re(parseInt(li));
 		}
-		$.get(`https://api.github.com/repos/${userRepo}/commits?per_page=10`, 'json').done(r => {
-			for (let c of r) {
-				const match = c.commit.message.match(/^Result (\d+)/);
-				if (match) {
-					let val = match[1];
-					localStorage.setItem('lastIndex', val);
-					localStorage.setItem('lastIndexTime', Date.now().toString());
-					$('#nav-page-nitems').html(val);
-					return re(parseInt(val));
-				}
-			}
-			re(li ? parseInt(li) : 0);
+		$.get('/high_id').done(r => {
+			let val = r.trim();
+			localStorage.setItem('lastIndex', val);
+			localStorage.setItem('lastIndexTime', Date.now().toString());
+			$('#nav-page-nitems').html(val);
+			re(parseInt(val));
 		}).fail(() => re(li ? parseInt(li) : 0));
 	});
 }
