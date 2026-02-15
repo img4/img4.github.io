@@ -123,11 +123,7 @@ async function initLastIndex() {
 
 async function getLastIndex(poll) {
 	return new Promise(re => {
-		let li = localStorage.getItem('lastIndex'), lit = localStorage.getItem('lastIndexTime');
-		if (!poll && li && Date.now() - parseInt(lit) <= 60000) {
-			$('#nav-page-nitems').html(li);
-			return re(parseInt(li));
-		}
+		let li = localStorage.getItem('lastIndex');
 		$.get('/high_id').done(r => {
 			let val = parseInt(r.trim());
 			let cur = localStorage.getItem('lastIndex') ? parseInt(localStorage.getItem('lastIndex')) : 0;
