@@ -276,10 +276,19 @@ function singlePagingInit() {
 			e.preventDefault();
 		})
 		.on('mousedown', function () { // Desktop fallback
-			longPressTimer = setTimeout(() => { if (lastIndex) { id = lastIndex.toString(36); history.replaceState(null, null, '?' + id); initSingle(id); } }, 2000);
+			isLongPress = false;
+			longPressTimer = setTimeout(() => {
+				isLongPress = true;
+				if (lastIndex) {
+					id = lastIndex.toString(36);
+					history.replaceState(null, null, '?' + id);
+					initSingle(id);
+				}
+			}, 2000);
 		})
 		.on('mouseup mouseleave', function () { clearTimeout(longPressTimer); })
 		.click(function (e) {
+			if (isLongPress) return;
 			if (e.detail > 0) singlePagingNext();
 		});
 }
