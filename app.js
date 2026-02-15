@@ -262,8 +262,8 @@ function singlePagingInit() {
 		.on('touchstart', function (e) {
 			isLongPress = false;
 			longPressTimer = setTimeout(() => {
+				isLongPress = true;
 				if (lastIndex) {
-					isLongPress = true;
 					id = lastIndex.toString(36);
 					history.replaceState(null, null, '?' + id);
 					initSingle(id);
