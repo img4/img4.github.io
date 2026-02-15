@@ -1,7 +1,7 @@
 let user = location.pathname.indexOf("/d/code") !== -1 ? 'img4' : location.host.split('.')[0];
 let userRepo = `${user}/${user}.github.io`;
 let id = (location.search ? location.search.substring(1) : '').split('&')[0];
-let lastIndex, pagefind;
+let lastIndex, pagefind, autoRefreshInterval;
 
 $(async () => {
 	await initLastIndex();
@@ -139,8 +139,10 @@ async function getLastIndex(poll) {
 }
 
 function initSingle(id) {
+	if (autoRefreshInterval) clearInterval(autoRefreshInterval);
 	(async () => {
 		let r = await getImageData(id);
+		if (id !== (location.search ? location.search.substring(1) : '').split('&')[0]) return;
 		const intId = parseInt(id, 36);
 		$('#nav-page-curitem').html(intId);
 		if (r) {
@@ -160,20 +162,20 @@ function initSingle(id) {
 			$('#main').html('<div id="notfound"><b>Image ' + id + ' not found</b><br>New images can take a few seconds to propagate<br><div id="auto-refresh-wrap">Auto-refreshing every 3s for 5m...<br><div class="spinner-border text-primary" role="status" style="margin-top:5px"><span class="visually-hidden">Loading...</span></div></div><a id="refresh-btn" class="btn btn-primary" style="display:none; margin-top:5px">Refresh</a><br></div>');
 			let arWrap = $('#auto-refresh-wrap');
 			let refreshBtn = $('#refresh-btn');
-			let arStartTime, arInterval;
+			let arStartTime;
 
 			let checkIt = function () {
 				(async () => {
 					console.log('checkIt(' + id + ')');
 					if (Date.now() - arStartTime > 300000) {
 						console.log('auto-refresh timeout, showing restart button');
-						clearInterval(arInterval);
+						clearInterval(autoRefreshInterval);
 						arWrap.hide();
 						refreshBtn.show();
 					}
 					r = await getImageData(id);
 					if (r) {
-						clearInterval(arInterval);
+						clearInterval(autoRefreshInterval);
 						showSingle(r);
 					}
 				})();
@@ -184,8 +186,8 @@ function initSingle(id) {
 				refreshBtn.hide();
 				arWrap.show();
 				arStartTime = Date.now();
-				if (arInterval) clearInterval(arInterval);
-				arInterval = setInterval(checkIt, 3000);
+				if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+				autoRefreshInterval = setInterval(checkIt, 3000);
 				if (!first) checkIt();
 			}
 
