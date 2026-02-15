@@ -38,7 +38,6 @@ jobs:
         run: pip install base36 pagefind
 
       - name: Build Shadow HTML and Generate high_id
-      - name: Build Shadow HTML and Generate high_id
         run: python -u build-search.py
 
       - name: Run Pagefind Indexer
