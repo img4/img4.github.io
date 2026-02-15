@@ -34,8 +34,7 @@ def process_files():
                         html_path = os.path.join(temp_html_dir, f"{base36_name}.html")
                         with open(html_path, "w", encoding="utf-8") as h:
                             # Pagefind treats the <title> as the result title
-                            h.write(f"<html><head><title>{decoded_p}</title></head>")
-                            h.write(f"<body>{decoded_p}</body></html>")
+                            h.write(f'<html><head><meta charset="utf-8"><title>{decoded_p}</title></head><body>{decoded_p}</body></html>')
                         count += 1
             except:
                 continue
