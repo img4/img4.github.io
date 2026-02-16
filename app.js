@@ -134,6 +134,10 @@ async function initSearch() {
 
 function navigateSearchResults() {
 	if (searchResults.length === 0) return;
+	const currentIdIndex = searchResults.findIndex(r => r.id === id);
+	if (currentIdIndex !== -1) {
+		searchResultIndex = currentIdIndex;
+	}
 	searchResultIndex = (searchResultIndex + 1) % searchResults.length;
 	const item = searchResults[searchResultIndex];
 	id = item.id;
