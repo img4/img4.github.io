@@ -75,23 +75,18 @@ a, a:hover, a:visited {
 #search-input {
     padding-right: 22px;
     flex: 1;
+    position: relative;
 }
 
 #search-clear-btn {
     position: absolute;
-    right: 37px;
+    right: 9px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
     font-size: inherit;
     color: #999;
     display: none;
-    pointer-events: auto;
-    z-index: 10;
-}
-
-#nav-input-wrap:not(:has(#search-next-btn:not([style*="display: none"]))) #search-clear-btn {
-    right: 5px;
 }
 
 #search-clear-btn:hover {
