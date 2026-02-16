@@ -61,15 +61,40 @@ a, a:hover, a:visited {
 #nav-input-wrap {
     position:relative;
     width: 200px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
 }
+
+.search-nav-btn {
+    background: #333;
+    border: 1px solid #555;
+    color: #c0c0c0;
+    cursor: pointer;
+    padding: 2px 8px;
+    font-size: 18px;
+    border-radius: 3px;
+    line-height: 1;
+}
+
+.search-nav-btn:hover:not(:disabled) {
+    background: #444;
+}
+
+.search-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 #search-input {
-    padding-right: 22px; /* Space for the X */
+    padding-right: 22px;
+    flex: 1;
 }
 
 #search-clear-btn {
     position: absolute;
-    right: 5px;
-    top: 45%;
+    right: 32px;
+    top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
     font-size: inherit;

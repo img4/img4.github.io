@@ -2,6 +2,8 @@ let user = location.pathname.indexOf("/d/code") !== -1 ? 'img4' : location.host.
 let userRepo = `${user}/${user}.github.io`;
 let id = (location.search ? location.search.substring(1) : '').split('&')[0];
 let lastIndex, pagefind, autoRefreshInterval;
+let searchResults = [];
+let searchResultIndex = -1;
 
 $(async () => {
 	await initLastIndex();
@@ -70,11 +72,14 @@ async function initSearch() {
 				}
 
 				clearTimeout(loadingTimer);
-				response(dataResults.map(item => ({
+				searchResults = dataResults.map(item => ({
 					label: item.meta.title,
 					value: item.meta.title,
 					id: item.url.replace('.html', '').split('/').pop()
-				})));
+				}));
+				searchResultIndex = searchResults.findIndex(r => r.id === id);
+				updateSearchNavButtons();
+				response(searchResults);
 			} catch (err) { clearTimeout(loadingTimer); response([]); }
 		},
 		search: function () {
@@ -88,6 +93,8 @@ async function initSearch() {
 		select: function (event, ui) {
 			if (!ui.item.id) return false;
 			id = ui.item.id;
+			searchResultIndex = searchResults.findIndex(r => r.id === id);
+			updateSearchNavButtons();
 			history.replaceState(null, null, '?' + id);
 			initSingle(id);
 			singlePagingInit();
@@ -107,7 +114,40 @@ async function initSearch() {
 		}
 	});
 
-	$('#search-clear-btn').click(() => searchInput.val('').focus());
+	$('#search-clear-btn').click(() => {
+		searchInput.val('').focus();
+		searchResults = [];
+		searchResultIndex = -1;
+		updateSearchNavButtons();
+	});
+
+	$('#search-prev-btn').click(() => navigateSearchResults(-1));
+	$('#search-next-btn').click(() => navigateSearchResults(1));
+}
+
+function navigateSearchResults(direction) {
+	if (searchResults.length === 0) return;
+	const newIndex = searchResultIndex + direction;
+	if (newIndex < 0 || newIndex >= searchResults.length) return;
+	searchResultIndex = newIndex;
+	const item = searchResults[searchResultIndex];
+	id = item.id;
+	updateSearchNavButtons();
+	history.replaceState(null, null, '?' + id);
+	initSingle(id);
+	singlePagingInit();
+}
+
+function updateSearchNavButtons() {
+	const prevBtn = $('#search-prev-btn');
+	const nextBtn = $('#search-next-btn');
+	if (searchResults.length === 0) {
+		prevBtn.hide();
+		nextBtn.hide();
+	} else {
+		prevBtn.show().prop('disabled', searchResultIndex <= 0);
+		nextBtn.show().prop('disabled', searchResultIndex >= searchResults.length - 1);
+	}
 }
 
 async function initLastIndex() {
