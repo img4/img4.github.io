@@ -48,7 +48,7 @@ $(async () => {
 async function initSearch() {
 	const searchInput = $('#search-input');
 	try {
-		pagefind = await import("/s/pagefind.js");
+		pagefind = await import("./s/pagefind.js");
 		await pagefind.init();
 	} catch (e) {
 		return searchInput.attr('placeholder', 'Search unavailable').prop('disabled', true);
