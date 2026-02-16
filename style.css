@@ -63,27 +63,13 @@ a, a:hover, a:visited {
     width: 200px;
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 4px;
 }
 
-.search-nav-btn {
-    background: #333;
-    border: 1px solid #555;
-    color: #c0c0c0;
-    cursor: pointer;
+#search-next-btn {
     padding: 2px 8px;
-    font-size: 18px;
-    border-radius: 3px;
-    line-height: 1;
-}
-
-.search-nav-btn:hover:not(:disabled) {
-    background: #444;
-}
-
-.search-nav-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+    font-size: 14px;
+    cursor: pointer;
 }
 
 #search-input {
