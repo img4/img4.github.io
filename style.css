@@ -96,7 +96,7 @@ a, a:hover, a:visited {
 }
 
 #nav-input-wrap.has-next #search-clear-btn {
-    right: 40px;
+    right: 35px;
 }
 
 #search-input:not(:placeholder-shown) + #search-clear-btn {
