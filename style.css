@@ -70,8 +70,6 @@ a, a:hover, a:visited {
     padding: 2px 8px;
     font-size: 14px;
     cursor: pointer;
-    border: 1px solid var(--bs-pagination-border-color) !important;
-    color: #0d6efd !important;
 }
 
 #search-input {
@@ -81,21 +79,19 @@ a, a:hover, a:visited {
 
 #search-clear-btn {
     position: absolute;
-    right: calc(32px + (var(--search-next-visible, 0) * 32px));
+    right: 5px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
     font-size: inherit;
     color: #999;
     display: none;
+    pointer-events: auto;
+    z-index: 10;
 }
 
-#nav-input-wrap:has(#search-next-btn:not([style*="display: none"])) {
-    --search-next-visible: 1;
-}
-
-#nav-input-wrap:has(#search-next-btn[style*="display: none"]) {
-    --search-next-visible: 0;
+#nav-input-wrap:has(#search-next-btn:not([style*="display: none"])) #search-clear-btn {
+    right: 37px;
 }
 
 #search-clear-btn:hover {
