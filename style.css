@@ -79,7 +79,7 @@ a, a:hover, a:visited {
 
 #search-clear-btn {
     position: absolute;
-    right: 5px;
+    right: 37px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
@@ -90,8 +90,8 @@ a, a:hover, a:visited {
     z-index: 10;
 }
 
-#nav-input-wrap:has(#search-next-btn:not([style*="display: none"])) #search-clear-btn {
-    right: 37px;
+#nav-input-wrap:not(:has(#search-next-btn:not([style*="display: none"]))) #search-clear-btn {
+    right: 5px;
 }
 
 #search-clear-btn:hover {

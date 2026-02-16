@@ -121,6 +121,14 @@ async function initSearch() {
 		updateSearchNavButtons();
 	});
 
+	searchInput.on('input', function() {
+		if ($(this).val() === '') {
+			searchResults = [];
+			searchResultIndex = -1;
+			updateSearchNavButtons();
+		}
+	});
+
 	$('#search-next-btn').click(() => navigateSearchResults());
 }
 
