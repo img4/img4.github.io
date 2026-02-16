@@ -95,6 +95,10 @@ a, a:hover, a:visited {
     color: #ccc;
 }
 
+#nav-input-wrap.has-next #search-clear-btn {
+    right: 40px;
+}
+
 #search-input:not(:placeholder-shown) + #search-clear-btn {
     display: block;
 }

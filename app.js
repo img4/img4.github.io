@@ -146,8 +146,10 @@ function updateSearchNavButtons() {
 	const nextBtn = $('#search-next-btn');
 	if (searchResults.length === 0) {
 		nextBtn.hide();
+		$('#nav-input-wrap').removeClass('has-next');
 	} else {
 		nextBtn.show();
+		$('#nav-input-wrap').addClass('has-next');
 	}
 }
 
