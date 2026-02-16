@@ -56,6 +56,7 @@ a, a:hover, a:visited {
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
+    color: rgb(137, 184, 254) !important;
 }
 
 #nav-input-wrap {
@@ -70,6 +71,7 @@ a, a:hover, a:visited {
     padding: 2px 8px;
     font-size: 14px;
     cursor: pointer;
+    color: rgb(137, 184, 254) !important;
 }
 
 #search-input {
