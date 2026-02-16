@@ -121,32 +121,25 @@ async function initSearch() {
 		updateSearchNavButtons();
 	});
 
-	$('#search-prev-btn').click(() => navigateSearchResults(-1));
-	$('#search-next-btn').click(() => navigateSearchResults(1));
+	$('#search-next-btn').click(() => navigateSearchResults());
 }
 
-function navigateSearchResults(direction) {
+function navigateSearchResults() {
 	if (searchResults.length === 0) return;
-	const newIndex = searchResultIndex + direction;
-	if (newIndex < 0 || newIndex >= searchResults.length) return;
-	searchResultIndex = newIndex;
+	searchResultIndex = (searchResultIndex + 1) % searchResults.length;
 	const item = searchResults[searchResultIndex];
 	id = item.id;
-	updateSearchNavButtons();
 	history.replaceState(null, null, '?' + id);
 	initSingle(id);
 	singlePagingInit();
 }
 
 function updateSearchNavButtons() {
-	const prevBtn = $('#search-prev-btn');
 	const nextBtn = $('#search-next-btn');
 	if (searchResults.length === 0) {
-		prevBtn.hide();
 		nextBtn.hide();
 	} else {
-		prevBtn.show().prop('disabled', searchResultIndex <= 0);
-		nextBtn.show().prop('disabled', searchResultIndex >= searchResults.length - 1);
+		nextBtn.show();
 	}
 }
 
