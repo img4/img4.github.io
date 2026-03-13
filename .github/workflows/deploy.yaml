@@ -46,27 +46,25 @@ jobs:
         # --index-attrs tells it to use the filename as the URL
         run: npx pagefind@latest --site temp_search_html --output-path s --force-language en
 
-      # Deploy the generated ./s folder to the 'page' branch
+      - name: Checkout Page Branch
+        uses: actions/checkout@v4
+        with:
+          ref: page
+          path: current_page
+        continue-on-error: true
+
+      - name: Prepare Deployment
+        run: |
+          mkdir -p current_page
+          rm -rf current_page/s current_page/.git
+          cp -r s current_page/
+          cp high_id current_page/
+
       - name: Deploy to Page Branch
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: page
-          publish_dir: ./s
-          destination_dir: s
+          publish_dir: ./current_page
           keep_files: false
-          full_commit_message: "Update search"
-
-      # Deploy only high_id file to page branch root
-      - name: Create temp dir for high_id
-        run: mkdir high_id_deploy && cp high_id high_id_deploy/
-
-      - name: Deploy high_id to Page Branch
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: page
-          publish_dir: ./high_id_deploy
-          destination_dir: .
-          keep_files: true
-          full_commit_message: "Update high_id"
+          full_commit_message: "Update search and high_id"
