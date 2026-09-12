@@ -1,11 +1,60 @@
 let user = location.pathname.indexOf("/d/code") !== -1 ? 'img4' : location.host.split('.')[0];
 let userRepo = `${user}/${user}.github.io`;
 let id = (location.search ? location.search.substring(1) : '').split('&')[0];
-let lastIndex, pagefind, autoRefreshInterval;
+let lastIndex, pagefind, autoRefreshInterval, activeCheckIt;
 let searchResults = [];
 let searchResultIndex = -1;
 
 $(async () => {
+	// Sync index updates across multiple tabs
+	window.addEventListener('storage', (e) => {
+		if (e.key === 'lastIndex' && e.newValue) {
+			const val = parseInt(e.newValue);
+			if (val > (lastIndex || 0)) {
+				lastIndex = val;
+				$('#nav-page-nitems').html(val);
+			}
+		}
+	});
+
+	// Resume polling, sync state, and catch up on tab refocus
+	let lastRefocusTime = 0;
+	async function onTabRefocus() {
+		const now = Date.now();
+		if (now - lastRefocusTime < 1000) return;
+		lastRefocusTime = now;
+
+		// 1. Immediately sync with localStorage in case another tab updated it while away
+		const cached = localStorage.getItem('lastIndex') ? parseInt(localStorage.getItem('lastIndex')) : 0;
+		if (cached > (lastIndex || 0)) {
+			lastIndex = cached;
+			$('#nav-page-nitems').html(lastIndex);
+		}
+
+		// 2. If index is older than 15s, poll server for latest high_id
+		const lastTime = parseInt(localStorage.getItem('lastIndexTime') || '0');
+		if (now - lastTime > 15000) {
+			const updated = await getLastIndex(true);
+			if (updated > lastIndex) {
+				lastIndex = updated;
+				$('#nav-page-nitems').html(lastIndex);
+			}
+		}
+
+		// 3. If an image is currently auto-refreshing, check immediately
+		if (activeCheckIt) {
+			activeCheckIt();
+		} else if (id && $('#notfound').length > 0) {
+			// If previous load failed or timed out, retry fetching the image
+			initSingle(id);
+		}
+	}
+
+	document.addEventListener('visibilitychange', () => {
+		if (!document.hidden) onTabRefocus();
+	});
+	window.addEventListener('focus', onTabRefocus);
+
 	await initLastIndex();
 	await initSearch();
 
@@ -160,6 +209,7 @@ function updateSearchNavButtons() {
 async function initLastIndex() {
 	lastIndex = await getLastIndex();
 	setInterval(async () => {
+		if (document.hidden) return;
 		const updated = await getLastIndex(true);
 		if (updated > lastIndex) {
 			lastIndex = updated;
@@ -171,15 +221,26 @@ async function initLastIndex() {
 async function getLastIndex(poll) {
 	return new Promise(re => {
 		let li = localStorage.getItem('lastIndex');
+		let lastTime = parseInt(localStorage.getItem('lastIndexTime') || '0');
+		let cur = li ? parseInt(li) : 0;
+		// If another tab fetched high_id within the last 14 seconds, reuse cached value
+		if (poll && (Date.now() - lastTime < 14000) && cur > 0) {
+			if (cur > (lastIndex || 0)) {
+				lastIndex = cur;
+				$('#nav-page-nitems').html(cur);
+			}
+			return re(cur);
+		}
 		$.get('./high_id').done(r => {
 			let val = parseInt(r.trim());
-			let cur = localStorage.getItem('lastIndex') ? parseInt(localStorage.getItem('lastIndex')) : 0;
+			cur = localStorage.getItem('lastIndex') ? parseInt(localStorage.getItem('lastIndex')) : 0;
 			if (val > cur) {
 				localStorage.setItem('lastIndex', val);
 				localStorage.setItem('lastIndexTime', Date.now().toString());
 				$('#nav-page-nitems').html(val);
 				re(val);
 			} else {
+				localStorage.setItem('lastIndexTime', Date.now().toString());
 				$('#nav-page-nitems').html(cur);
 				re(cur);
 			}
@@ -191,14 +252,26 @@ async function getLastIndex(poll) {
 	});
 }
 
+function showRateLimit(status, targetId) {
+	if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+	activeCheckIt = null;
+	$('link[rel="icon"]').remove();
+	$('title').text('Rate limited');
+	$('#main').html(`<div id="notfound"><b>Rate limit reached (${status || 429})</b><br>GitHub rate limit exceeded. Please wait a moment before trying again.<br><a id="refresh-btn" class="btn btn-primary" style="margin-top:10px">Retry</a></div>`);
+	$('#refresh-btn').click(function () {
+		initSingle(targetId);
+	});
+}
+
 function initSingle(id) {
 	if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+	activeCheckIt = null;
 	(async () => {
 		let r = await getImageData(id);
 		if (id !== (location.search ? location.search.substring(1) : '').split('&')[0]) return;
 		const intId = parseInt(id, 36);
 		$('#nav-page-curitem').html(intId);
-		if (r) {
+		if (r && !r.error) {
 			// if found image has id greater than lastIndex, update lastIndex
 			if (intId > lastIndex) {
 				console.log('found id ' + intId + ' > lastIndex ' + lastIndex + ', updating');
@@ -208,6 +281,8 @@ function initSingle(id) {
 				$('#nav-page-nitems').html(lastIndex);
 			}
 			showSingle(r);
+		} else if (r && r.error === 'rate_limit') {
+			showRateLimit(r.status, id);
 		} else {
 			$('link[rel="icon"]').remove();
 			$('title').text('Not found');
@@ -218,18 +293,25 @@ function initSingle(id) {
 			let arStartTime;
 
 			let checkIt = function () {
+				if (document.hidden) return;
 				(async () => {
 					console.log('checkIt(' + id + ')');
 					if (Date.now() - arStartTime > 300000) {
 						console.log('auto-refresh timeout, showing restart button');
 						clearInterval(autoRefreshInterval);
+						activeCheckIt = null;
 						arWrap.hide();
 						refreshBtn.show();
+						return;
 					}
 					r = await getImageData(id);
-					if (r) {
+					if (id !== (location.search ? location.search.substring(1) : '').split('&')[0]) return;
+					if (r && !r.error) {
 						clearInterval(autoRefreshInterval);
+						activeCheckIt = null;
 						showSingle(r);
+					} else if (r && r.error === 'rate_limit') {
+						showRateLimit(r.status, id);
 					}
 				})();
 			};
@@ -240,6 +322,7 @@ function initSingle(id) {
 				arWrap.show();
 				arStartTime = Date.now();
 				if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+				activeCheckIt = checkIt;
 				autoRefreshInterval = setInterval(checkIt, 3000);
 				if (!first) checkIt();
 			}
@@ -261,7 +344,13 @@ async function getImageData(id) {
 			data.p = b64Decode(data.p);
 			if (data.p2) data.p2 = b64Decode(data.p2);
 			re(data);
-		}).fail(() => re(false));
+		}).fail((xhr) => {
+			if (xhr && (xhr.status === 429 || xhr.status === 403)) {
+				re({ error: 'rate_limit', status: xhr.status });
+			} else {
+				re(false);
+			}
+		});
 	});
 }
 
